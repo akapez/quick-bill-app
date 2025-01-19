@@ -1,1 +1,1 @@
-yarn lint
+npx --no -- commitlint --edit 
