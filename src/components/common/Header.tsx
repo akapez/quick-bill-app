@@ -1,7 +1,5 @@
 import Link from 'next/link';
 
-import { Search } from 'lucide-react';
-
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/Avatar';
 import { Button } from '../ui/Button';
 import Menu from './Menu';

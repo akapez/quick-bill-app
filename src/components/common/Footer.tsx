@@ -12,7 +12,7 @@ export default function Footer() {
           <Link href="/" className="flex items-center space-x-2">
             <span className="font-bold">QuickBill</span>
           </Link>
-          <p className="text-muted-foreground text-center text-sm leading-loose md:text-left">
+          <p className="text-center text-sm leading-loose text-muted-foreground md:text-left">
             © 2025 QuickBill Inc. All rights reserved.
           </p>
         </div>

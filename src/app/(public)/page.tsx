@@ -12,7 +12,7 @@ export default function Home() {
             <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none">
               Simplify Your Invoicing Process
             </h2>
-            <p className="mx-auto max-w-[700px] text-gray-500 md:text-lg dark:text-gray-400">
+            <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-lg">
               Streamline your billing, get paid faster, and manage your
               finances.
             </p>
