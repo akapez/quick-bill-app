@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Button } from '../../ui/Button';
 import { FacebookIcon, InstagramIcon, XIcon } from './icons';
 
-const Footer: React.FC = () => {
+export default function Footer() {
   return (
     <footer className="fixed bottom-0 left-0 flex w-full items-center justify-center border-t bg-background md:px-5">
       <div className="container flex flex-col items-center justify-between gap-4 py-4 md:h-16 md:flex-row md:py-0">
@@ -29,6 +29,4 @@ const Footer: React.FC = () => {
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

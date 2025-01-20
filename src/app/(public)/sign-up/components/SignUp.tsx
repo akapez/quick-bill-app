@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+
+// import { useRouter } from 'next/navigation';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { SignUpSchema, signUpSchema } from '@lib/zod-schema/sign-up';
@@ -20,7 +21,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -29,7 +29,7 @@ import {
 import { Input } from '@components/ui/Input';
 
 const SignUp = () => {
-  const router = useRouter();
+  // const router = useRouter();
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -44,7 +44,9 @@ const SignUp = () => {
     formState: { isSubmitting },
   } = form;
 
-  const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {};
+  const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {
+    console.log(data);
+  };
 
   return (
     <Card className="mx-auto w-80 md:w-96">
