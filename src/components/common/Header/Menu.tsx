@@ -2,9 +2,8 @@
 
 import Link from 'next/link';
 
-import { Book, LogOut, User } from 'lucide-react';
-
-// import { signOut } from "next-auth/react";
+import { LogOut, User } from 'lucide-react';
+import { signOut } from 'next-auth/react';
 
 import {
   DropdownMenu,
@@ -17,22 +16,15 @@ import {
 
 interface MenuProps {
   children: React.ReactNode;
-  role: string | undefined;
-  firstName: string;
-  lastName: string;
+  name: string;
 }
 
-export default function Menu({
-  children,
-  role,
-  firstName,
-  lastName,
-}: MenuProps) {
+export default function Menu({ children, name }: MenuProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>{children}</DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuLabel>{`${firstName} ${lastName}`}</DropdownMenuLabel>
+        <DropdownMenuLabel>{`${name}`}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <Link href="/manage">
           <DropdownMenuItem className="cursor-pointer">
@@ -40,29 +32,15 @@ export default function Menu({
             <span>Profile</span>
           </DropdownMenuItem>
         </Link>
-        {role === 'ADMIN' && (
-          <>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel>Admin Menu</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <Link href="/manage/books">
-              <DropdownMenuItem className="cursor-pointer">
-                <Book />
-                <span>Books Manage</span>
-              </DropdownMenuItem>
-            </Link>{' '}
-          </>
-        )}
-
         <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"
-          //   onClick={() =>
-          //     signOut({
-          //       redirect: true,
-          //       callbackUrl: "/sign-in",
-          //     })
-          //   }
+          onClick={() =>
+            signOut({
+              redirect: true,
+              callbackUrl: '/sign-in',
+            })
+          }
         >
           <LogOut />
           <span>Sign Out</span>

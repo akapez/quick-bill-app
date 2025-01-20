@@ -1,14 +1,16 @@
 'use client';
 
+import { useTransition } from 'react';
 import Link from 'next/link';
 
-// import { useRouter } from 'next/navigation';
-
+import { register } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useToast } from '@hooks/useToast';
 import { SignUpSchema, signUpSchema } from '@lib/zod-schema/sign-up';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import GoogleButton from '@components/common/GoogleButton';
 import { Button } from '@components/ui/Button';
 import {
   Card,
@@ -27,25 +29,37 @@ import {
   FormMessage,
 } from '@components/ui/Form';
 import { Input } from '@components/ui/Input';
+import { Separator } from '@components/ui/Separator';
 
 const SignUp = () => {
-  // const router = useRouter();
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
     },
   });
 
-  const {
-    handleSubmit,
-    control,
-    formState: { isSubmitting },
-  } = form;
+  const { handleSubmit, control } = form;
 
   const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {
-    console.log(data);
+    startTransition(() => {
+      register(data).then((data) => {
+        if (data.success) {
+          toast({
+            title: data.success,
+          });
+        } else {
+          toast({
+            variant: 'destructive',
+            title: data.error,
+          });
+        }
+      });
+    });
   };
 
   return (
@@ -66,6 +80,24 @@ const SignUp = () => {
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             <div className="space-y-2">
+              <FormField
+                control={control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor="name">Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        id="name"
+                        type="text"
+                        placeholder="Name"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={control}
                 name="email"
@@ -104,12 +136,12 @@ const SignUp = () => {
               />
             </div>
             <Button
-              disabled={isSubmitting}
+              disabled={isPending}
               id="sign-up-btn"
               className="w-full"
               type="submit"
             >
-              {isSubmitting ? (
+              {isPending ? (
                 <>
                   <Loader2 className="animate-spin" />
                   Please wait
@@ -120,6 +152,12 @@ const SignUp = () => {
             </Button>
           </form>
         </Form>
+        <div className="flex items-center gap-4">
+          <Separator className="flex-1" />
+          <span className="text-muted-foreground">or</span>
+          <Separator className="flex-1" />
+        </div>
+        <GoogleButton />
       </CardContent>
       <CardFooter
         id="sign-up-card-footer"

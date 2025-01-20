@@ -3,6 +3,10 @@ import { Roboto } from 'next/font/google';
 
 import './globals.css';
 
+import { auth } from '@lib/auth';
+import { SessionProvider } from '@providers/session.provider';
+import { Toaster } from '@providers/toast.provider';
+
 import Footer from '@components/common/Footer';
 
 const roboto = Roboto({
@@ -18,17 +22,21 @@ export const metadata: Metadata = {
     'Streamline your invoicing process with ease. Create, send, and manage invoices in seconds with our user-friendly app. ',
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await auth();
   return (
-    <html lang="en">
-      <body className={`${roboto.className} antialiased`}>
-        {children}
-        <Footer />
-      </body>
-    </html>
+    <SessionProvider session={session}>
+      <html lang="en">
+        <body className={`${roboto.className} antialiased`}>
+          {children}
+          <Footer />
+          <Toaster />
+        </body>
+      </html>
+    </SessionProvider>
   );
 }

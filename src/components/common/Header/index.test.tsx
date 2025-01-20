@@ -15,9 +15,7 @@ jest.mock('./Menu', () => ({
 
 describe('Header Component', () => {
   const defaultProps: HeaderProps = {
-    role: 'USER',
-    firstName: 'Avishka',
-    lastName: 'Kapuruge',
+    name: 'Avishka Kapuruge',
   };
   it('renders QuickBill logo correctly', () => {
     render(<Header {...defaultProps} />);

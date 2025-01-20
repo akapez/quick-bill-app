@@ -1,14 +1,16 @@
 'use client';
 
+import { useTransition } from 'react';
 import Link from 'next/link';
 
-// import { useRouter } from 'next/navigation';
-
+import { login } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useToast } from '@hooks/useToast';
 import { SignInSchema, signInSchema } from '@lib/zod-schema/sign-in';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 
+import GoogleButton from '@components/common/GoogleButton';
 import { Button } from '@components/ui/Button';
 import {
   Card,
@@ -27,9 +29,11 @@ import {
   FormMessage,
 } from '@components/ui/Form';
 import { Input } from '@components/ui/Input';
+import { Separator } from '@components/ui/Separator';
 
 const SignIn = () => {
-  // const router = useRouter();
+  const { toast } = useToast();
+  const [isPending, startTransition] = useTransition();
   const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -38,14 +42,23 @@ const SignIn = () => {
     },
   });
 
-  const {
-    handleSubmit,
-    control,
-    formState: { isSubmitting },
-  } = form;
+  const { handleSubmit, control } = form;
 
   const onSubmit: SubmitHandler<SignInSchema> = async (data) => {
-    console.log(data);
+    startTransition(() => {
+      login(data).then((data) => {
+        if (data.success) {
+          toast({
+            title: data.success,
+          });
+        } else {
+          toast({
+            variant: 'destructive',
+            title: data.error,
+          });
+        }
+      });
+    });
   };
 
   return (
@@ -105,12 +118,12 @@ const SignIn = () => {
               />
             </div>
             <Button
-              disabled={isSubmitting}
+              disabled={isPending}
               id="sign-in-btn"
               className="w-full"
               type="submit"
             >
-              {isSubmitting ? (
+              {isPending ? (
                 <>
                   <Loader2 className="animate-spin" />
                   Please wait
@@ -121,6 +134,12 @@ const SignIn = () => {
             </Button>
           </form>
         </Form>
+        <div className="flex items-center gap-4">
+          <Separator className="flex-1" />
+          <span className="text-muted-foreground">or</span>
+          <Separator className="flex-1" />
+        </div>
+        <GoogleButton />
       </CardContent>
       <CardFooter
         id="sign-up-card-footer"
