@@ -13,7 +13,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '../ui/DropDown';
+} from '../../ui/DropDown';
 
 interface MenuProps {
   children: React.ReactNode;
