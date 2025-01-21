@@ -5,7 +5,7 @@ import './globals.css';
 
 import { auth } from '@lib/auth';
 import { SessionProvider } from '@providers/session.provider';
-import { Toaster } from '@providers/toast.provider';
+import { ToasterProvider } from '@providers/toast.provider';
 
 import Footer from '@components/common/Footer';
 
@@ -34,7 +34,7 @@ export default async function RootLayout({
         <body className={`${roboto.className} antialiased`}>
           {children}
           <Footer />
-          <Toaster />
+          <ToasterProvider />
         </body>
       </html>
     </SessionProvider>

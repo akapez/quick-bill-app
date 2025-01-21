@@ -14,6 +14,7 @@ export default async function PrivateLayout({
       email: session.user.email,
       image: session.user.image,
       id: session.user.id,
+      role: session.user.role,
     };
   }
   return (

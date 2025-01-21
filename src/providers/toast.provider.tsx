@@ -1,36 +1,16 @@
 'use client';
 
-import { useToast } from '@hooks/useToast';
+import { CircleAlert, CircleCheck, CircleX } from 'lucide-react';
+import { Toaster } from 'sonner';
 
-import {
-  Toast,
-  ToastClose,
-  ToastDescription,
-  ToastProvider,
-  ToastTitle,
-  ToastViewport,
-} from '@components/ui/Toast';
-
-export function Toaster() {
-  const { toasts } = useToast();
-
+export const ToasterProvider = () => {
   return (
-    <ToastProvider>
-      {toasts.map(function ({ id, title, description, action, ...props }) {
-        return (
-          <Toast key={id} {...props}>
-            <div className="grid gap-1">
-              {title && <ToastTitle>{title}</ToastTitle>}
-              {description && (
-                <ToastDescription>{description}</ToastDescription>
-              )}
-            </div>
-            {action}
-            <ToastClose />
-          </Toast>
-        );
-      })}
-      <ToastViewport />
-    </ToastProvider>
+    <Toaster
+      icons={{
+        success: <CircleCheck color="#16C47F" />,
+        warning: <CircleAlert color="#FCC737" />,
+        error: <CircleX color="#FF2929" />,
+      }}
+    />
   );
-}
+};

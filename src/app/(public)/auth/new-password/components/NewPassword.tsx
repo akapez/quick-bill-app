@@ -2,15 +2,18 @@
 
 import { useTransition } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
-import { login } from '@actions/user';
+import { newPassword } from '@actions/new-password';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SignInSchema, signInSchema } from '@lib/zod-schema/sign-in';
+import {
+  NewPasswordSchema,
+  newPasswordSchema,
+} from '@lib/zod-schema/new-password';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import GoogleButton from '@components/common/GoogleButton';
 import { Button } from '@components/ui/Button';
 import {
   Card,
@@ -29,23 +32,23 @@ import {
   FormMessage,
 } from '@components/ui/Form';
 import { Input } from '@components/ui/Input';
-import { Separator } from '@components/ui/Separator';
 
-const SignIn = () => {
+const NewPassword = () => {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
   const [isPending, startTransition] = useTransition();
-  const form = useForm<SignInSchema>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<NewPasswordSchema>({
+    resolver: zodResolver(newPasswordSchema),
     defaultValues: {
-      email: '',
       password: '',
     },
   });
 
   const { handleSubmit, control } = form;
 
-  const onSubmit: SubmitHandler<SignInSchema> = async (data) => {
+  const onSubmit: SubmitHandler<NewPasswordSchema> = async (data) => {
     startTransition(() => {
-      login(data).then((data) => {
+      newPassword(data, token).then((data) => {
         if (!data) return;
         if (data.success) {
           toast.success(data.success);
@@ -57,47 +60,30 @@ const SignIn = () => {
   };
 
   return (
-    <Card className="mx-auto mt-5 w-80 md:w-96">
+    <Card className="mx-auto w-80 md:w-96">
       <CardHeader className="space-y-1">
         <CardTitle
           className="text-2xl font-bold"
           role="heading"
           id="sign-in-card-header"
         >
-          Sign In
+          Enter New Password
         </CardTitle>
         <CardDescription id="sign-in-card-description">
-          Welcome back to{' '}
+          Enter your new password to access your{' '}
           <Link
             href="/"
             className="cursor-pointer font-bold text-[#B771E5] hover:underline"
           >
             QuickBill
-          </Link>
+          </Link>{' '}
+          account.
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-2">
-              <FormField
-                control={control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="email">Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Email"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={control}
                 name="password"
@@ -117,15 +103,10 @@ const SignIn = () => {
                 )}
               />
             </div>
-            <div className="my-2 flex justify-end">
-              <Button asChild variant="link" size="sm" className="p-0">
-                <Link href="/auth/reset">Forgot Password?</Link>
-              </Button>
-            </div>
             <Button
               disabled={isPending}
               id="sign-in-btn"
-              className="w-full"
+              className="mt-4 w-full"
               type="submit"
             >
               {isPending ? (
@@ -134,26 +115,16 @@ const SignIn = () => {
                   Please wait
                 </>
               ) : (
-                'Sign In'
+                'Reset Password'
               )}
             </Button>
           </form>
         </Form>
-        <div className="flex items-center gap-4">
-          <Separator className="flex-1" />
-          <span className="text-muted-foreground">or</span>
-          <Separator className="flex-1" />
-        </div>
-        <GoogleButton />
       </CardContent>
-      <CardFooter
-        id="sign-up-card-footer"
-        className="flex justify-center text-sm"
-      >
-        Don&apos;t have an account?
-        <Link href="/sign-up">
+      <CardFooter id="sign-up-card-footer" className="flex justify-center">
+        <Link href="/sign-in">
           <Button id="sign-up-btn" variant="link">
-            Register
+            Back to Sign In
           </Button>
         </Link>
       </CardFooter>
@@ -161,4 +132,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default NewPassword;

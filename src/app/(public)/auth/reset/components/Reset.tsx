@@ -3,14 +3,16 @@
 import { useTransition } from 'react';
 import Link from 'next/link';
 
-import { login } from '@actions/user';
+import { reset } from '@actions/reset-password';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SignInSchema, signInSchema } from '@lib/zod-schema/sign-in';
+import {
+  PasswordResetSchema,
+  passwordResetSchema,
+} from '@lib/zod-schema/password-reset';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import GoogleButton from '@components/common/GoogleButton';
 import { Button } from '@components/ui/Button';
 import {
   Card,
@@ -29,23 +31,21 @@ import {
   FormMessage,
 } from '@components/ui/Form';
 import { Input } from '@components/ui/Input';
-import { Separator } from '@components/ui/Separator';
 
-const SignIn = () => {
+const Reset = () => {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<SignInSchema>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<PasswordResetSchema>({
+    resolver: zodResolver(passwordResetSchema),
     defaultValues: {
       email: '',
-      password: '',
     },
   });
 
   const { handleSubmit, control } = form;
 
-  const onSubmit: SubmitHandler<SignInSchema> = async (data) => {
+  const onSubmit: SubmitHandler<PasswordResetSchema> = async (data) => {
     startTransition(() => {
-      login(data).then((data) => {
+      reset(data).then((data) => {
         if (!data) return;
         if (data.success) {
           toast.success(data.success);
@@ -57,23 +57,24 @@ const SignIn = () => {
   };
 
   return (
-    <Card className="mx-auto mt-5 w-80 md:w-96">
+    <Card className="mx-auto w-80 md:w-96">
       <CardHeader className="space-y-1">
         <CardTitle
           className="text-2xl font-bold"
           role="heading"
           id="sign-in-card-header"
         >
-          Sign In
+          Reset Password
         </CardTitle>
         <CardDescription id="sign-in-card-description">
-          Welcome back to{' '}
+          Forgot your password? No worries! Enter your email to reset your{' '}
           <Link
             href="/"
             className="cursor-pointer font-bold text-[#B771E5] hover:underline"
           >
             QuickBill
-          </Link>
+          </Link>{' '}
+          password.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -98,34 +99,11 @@ const SignIn = () => {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel htmlFor="password">Password</FormLabel>
-                    <FormControl>
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Password"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="my-2 flex justify-end">
-              <Button asChild variant="link" size="sm" className="p-0">
-                <Link href="/auth/reset">Forgot Password?</Link>
-              </Button>
             </div>
             <Button
               disabled={isPending}
               id="sign-in-btn"
-              className="w-full"
+              className="mt-4 w-full"
               type="submit"
             >
               {isPending ? (
@@ -134,26 +112,16 @@ const SignIn = () => {
                   Please wait
                 </>
               ) : (
-                'Sign In'
+                'Send Reset Email'
               )}
             </Button>
           </form>
         </Form>
-        <div className="flex items-center gap-4">
-          <Separator className="flex-1" />
-          <span className="text-muted-foreground">or</span>
-          <Separator className="flex-1" />
-        </div>
-        <GoogleButton />
       </CardContent>
-      <CardFooter
-        id="sign-up-card-footer"
-        className="flex justify-center text-sm"
-      >
-        Don&apos;t have an account?
-        <Link href="/sign-up">
+      <CardFooter id="sign-up-card-footer" className="flex justify-center">
+        <Link href="/sign-in">
           <Button id="sign-up-btn" variant="link">
-            Register
+            Back to Sign In
           </Button>
         </Link>
       </CardFooter>
@@ -161,4 +129,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default Reset;

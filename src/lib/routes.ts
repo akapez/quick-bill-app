@@ -1,6 +1,12 @@
-export const PUBLIC_ROUTES = ['/'];
+export const PUBLIC_ROUTES = ['/', '/auth/new-verification'];
 
-export const AUTH_ROUTES = ['/sign-in', '/sign-up'];
+export const AUTH_ROUTES = [
+  '/sign-in',
+  '/sign-up',
+  '/auth/error',
+  '/auth/reset',
+  '/auth/new-password',
+];
 
 export const DEFAULT_REDIRECT = '/dashboard';
 

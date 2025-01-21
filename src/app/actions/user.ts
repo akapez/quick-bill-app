@@ -1,12 +1,16 @@
 'use server';
 
 import { signIn } from '@lib/auth';
+import { sendVerificationEmail } from '@lib/mail';
 import { prisma } from '@lib/prisma';
 import { DEFAULT_REDIRECT } from '@lib/routes';
+import { generateVerificationToken } from '@lib/tokens';
 import { SignInSchema, signInSchema } from '@lib/zod-schema/sign-in';
 import { SignUpSchema, signUpSchema } from '@lib/zod-schema/sign-up';
 import bcrypt from 'bcryptjs';
 import { AuthError } from 'next-auth';
+
+import { getUserByEmail } from './data';
 
 export const register = async (values: SignUpSchema) => {
   const validatedFields = signUpSchema.safeParse(values);
@@ -27,9 +31,11 @@ export const register = async (values: SignUpSchema) => {
     },
   });
 
-  //send verification email
+  const verificationToken = await generateVerificationToken(email);
 
-  return { success: 'You have successfully registered!' };
+  await sendVerificationEmail(verificationToken.email, verificationToken.token);
+
+  return { success: 'Confirmation email sent!' };
 };
 
 export const login = async (values: SignInSchema) => {
@@ -38,35 +44,35 @@ export const login = async (values: SignInSchema) => {
     return { error: 'Invalid fields!' };
   }
   const { email, password } = validatedFields.data;
+  const existingUser = await getUserByEmail(email);
+  if (!existingUser || !existingUser.hashedPassword || !existingUser.email) {
+    return { error: 'Invalid credentials!' };
+  }
+  if (!existingUser.emailVerified) {
+    const verificationToken = await generateVerificationToken(
+      existingUser.email
+    );
+    await sendVerificationEmail(
+      verificationToken.email,
+      verificationToken.token
+    );
+    return { success: 'Confirmation email sent!' };
+  }
   try {
     await signIn('credentials', {
       email,
       password,
       redirectTo: DEFAULT_REDIRECT,
     });
-    return { success: 'You have successfully registered! You can now sign.' };
   } catch (error) {
     if (error instanceof AuthError) {
-      return { error: error.cause?.err?.message };
+      switch (error.type) {
+        case 'CredentialsSignin':
+          return { error: 'Invalid credentials!' };
+        default:
+          return { error: error.cause?.err?.message };
+      }
     }
     throw error;
-  }
-};
-
-export const getUserByEmail = async (email: string) => {
-  try {
-    const user = await prisma.user.findUnique({ where: { email } });
-    return user;
-  } catch (error) {
-    return error;
-  }
-};
-
-export const getUserById = async (id: string) => {
-  try {
-    const user = await prisma.user.findUnique({ where: { id } });
-    return user;
-  } catch (error) {
-    return error;
   }
 };

@@ -38,7 +38,7 @@ model Account {
   providerAccountId String
   refresh_token String? @db.String
   access_token String? @db.String
-  expire_at Int?
+  expires_at Int?
   token_type String?
   scope String?
   id_token String?
@@ -49,3 +49,20 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
+model VerificationToken {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  email String
+  token String @unique
+  expires DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  email String
+  token String @unique
+  expires DateTime
+
+  @@unique([email, token])
+}

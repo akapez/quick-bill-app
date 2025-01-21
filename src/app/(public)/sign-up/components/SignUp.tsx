@@ -5,10 +5,10 @@ import Link from 'next/link';
 
 import { register } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useToast } from '@hooks/useToast';
 import { SignUpSchema, signUpSchema } from '@lib/zod-schema/sign-up';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 
 import GoogleButton from '@components/common/GoogleButton';
 import { Button } from '@components/ui/Button';
@@ -32,7 +32,6 @@ import { Input } from '@components/ui/Input';
 import { Separator } from '@components/ui/Separator';
 
 const SignUp = () => {
-  const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
@@ -49,14 +48,9 @@ const SignUp = () => {
     startTransition(() => {
       register(data).then((data) => {
         if (data.success) {
-          toast({
-            title: data.success,
-          });
+          toast.success(data.success);
         } else {
-          toast({
-            variant: 'destructive',
-            title: data.error,
-          });
+          toast.error(data.error);
         }
       });
     });
@@ -73,12 +67,18 @@ const SignUp = () => {
           Register
         </CardTitle>
         <CardDescription id="sign-up-card-description">
-          Join the <span className="font-bold text-[#B771E5]">QuickBill</span>
+          Join the{' '}
+          <Link
+            href="/"
+            className="cursor-pointer font-bold text-[#B771E5] hover:underline"
+          >
+            QuickBill
+          </Link>
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+          <form onSubmit={handleSubmit(onSubmit)}>
             <div className="space-y-2">
               <FormField
                 control={control}
@@ -138,7 +138,7 @@ const SignUp = () => {
             <Button
               disabled={isPending}
               id="sign-up-btn"
-              className="w-full"
+              className="mt-4 w-full"
               type="submit"
             >
               {isPending ? (

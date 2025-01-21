@@ -1,8 +1,12 @@
+import { DEFAULT_REDIRECT } from '@lib/routes';
+import { signIn } from 'next-auth/react';
+
 import { Button } from '../../ui/Button';
 
 export default function GoogleButton() {
   return (
     <Button
+      onClick={() => signIn('google', { callbackUrl: DEFAULT_REDIRECT })}
       variant="outline"
       className="flex h-10 w-full items-center justify-center gap-3 rounded-[4px] border border-gray-300 bg-white px-3 text-[14px] font-medium text-gray-700 hover:bg-gray-50"
     >
