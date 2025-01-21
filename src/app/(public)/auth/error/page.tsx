@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: 'Auth Error - QuickBill',
 };
 
-const AuthErrorPage = () => {
+export default function AuthErrorPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gray-100">
       <div className="text-center">
@@ -26,6 +26,4 @@ const AuthErrorPage = () => {
       </div>
     </div>
   );
-};
-
-export default AuthErrorPage;
+}

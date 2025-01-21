@@ -15,6 +15,13 @@ enum UserRole {
   USER
 }
 
+enum Status {
+  OPEN
+  PAID
+  VOID
+  UNCOLLECTIBLE
+}
+
 model User {
   id String @id @default(auto()) @map("_id") @db.ObjectId
   name String?
@@ -27,6 +34,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   accounts Account[]
+  invoices Invoice[]
 
 }
 
@@ -64,5 +72,21 @@ model PasswordResetToken {
   token String @unique
   expires DateTime
 
-  @@unique([email, token])
+  @@unique([email, token])  
+}
+
+
+model Invoice {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  billingName String
+  billingEmail String
+  description String
+  amount Float
+  status Status @default(OPEN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
 }

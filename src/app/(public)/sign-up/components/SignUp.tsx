@@ -31,7 +31,7 @@ import {
 import { Input } from '@components/ui/Input';
 import { Separator } from '@components/ui/Separator';
 
-const SignUp = () => {
+export default function SignUp() {
   const [isPending, startTransition] = useTransition();
   const form = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
@@ -42,13 +42,14 @@ const SignUp = () => {
     },
   });
 
-  const { handleSubmit, control } = form;
+  const { handleSubmit, control, reset } = form;
 
   const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {
     startTransition(() => {
       register(data).then((data) => {
         if (data.success) {
           toast.success(data.success);
+          reset();
         } else {
           toast.error(data.error);
         }
@@ -172,6 +173,4 @@ const SignUp = () => {
       </CardFooter>
     </Card>
   );
-};
-
-export default SignUp;
+}

@@ -8,12 +8,10 @@ export const metadata: Metadata = {
     'Create a QuickBill account to streamline your invoice process. Sign up today!',
 };
 
-const SignUpPage = () => {
+export default function SignUpPage() {
   return (
     <div className="grid min-h-screen w-full place-content-center bg-gradient-to-b from-blue-100 to-white">
       <SignUp />
     </div>
   );
-};
-
-export default SignUpPage;
+}

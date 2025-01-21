@@ -1,8 +1,11 @@
 import Link from 'next/link';
 
+import { auth } from '@lib/auth';
+
 import { Button } from '@components/ui/Button';
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
   return (
     <section className="grid min-h-screen w-full place-content-center bg-gradient-to-b from-blue-100 to-white">
       <div className="px-4 md:px-6">
@@ -19,7 +22,11 @@ export default function Home() {
           </div>
           <div className="space-x-4">
             <Button asChild>
-              <Link href="/sign-in">Get Started</Link>
+              {session?.user.id ? (
+                <Link href="/dashboard">Dashboard</Link>
+              ) : (
+                <Link href="/sign-in">Get Started</Link>
+              )}
             </Button>
             <Button variant="outline">Learn More</Button>
           </div>

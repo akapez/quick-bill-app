@@ -13,7 +13,7 @@ export default function Header({ imageUrl, name }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 flex w-full items-center justify-center border-b bg-background/95 px-5 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16">
-        <Link href="/dashboard" className="flex items-center">
+        <Link href="/" className="flex items-center">
           <span className="font-bold sm:inline-block">QuickBill</span>
         </Link>
         <div className="flex flex-1 items-center justify-end space-x-2">

@@ -4,7 +4,7 @@ import { useTransition } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-import { newPassword } from '@actions/new-password';
+import { newPassword } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   NewPasswordSchema,
@@ -33,7 +33,7 @@ import {
 } from '@components/ui/Form';
 import { Input } from '@components/ui/Input';
 
-const NewPassword = () => {
+export default function NewPassword() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const [isPending, startTransition] = useTransition();
@@ -44,7 +44,7 @@ const NewPassword = () => {
     },
   });
 
-  const { handleSubmit, control } = form;
+  const { handleSubmit, control, reset } = form;
 
   const onSubmit: SubmitHandler<NewPasswordSchema> = async (data) => {
     startTransition(() => {
@@ -52,6 +52,7 @@ const NewPassword = () => {
         if (!data) return;
         if (data.success) {
           toast.success(data.success);
+          reset();
         } else {
           toast.error(data.error);
         }
@@ -130,6 +131,4 @@ const NewPassword = () => {
       </CardFooter>
     </Card>
   );
-};
-
-export default NewPassword;
+}

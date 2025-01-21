@@ -3,7 +3,7 @@
 import { useTransition } from 'react';
 import Link from 'next/link';
 
-import { reset } from '@actions/reset-password';
+import { reset } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   PasswordResetSchema,
@@ -32,7 +32,7 @@ import {
 } from '@components/ui/Form';
 import { Input } from '@components/ui/Input';
 
-const Reset = () => {
+export default function PasswordReset() {
   const [isPending, startTransition] = useTransition();
   const form = useForm<PasswordResetSchema>({
     resolver: zodResolver(passwordResetSchema),
@@ -127,6 +127,4 @@ const Reset = () => {
       </CardFooter>
     </Card>
   );
-};
-
-export default Reset;
+}

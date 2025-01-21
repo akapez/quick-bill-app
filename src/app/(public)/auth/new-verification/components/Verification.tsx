@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-import { newVerification } from '@actions/new-verification';
+import { newVerification } from '@actions/user';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 
 import { Button } from '@components/ui/Button';
@@ -17,7 +17,7 @@ import {
 } from '@components/ui/Card';
 import { Separator } from '@components/ui/Separator';
 
-const Verification = () => {
+export default function Verification() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const [status, setStatus] = useState<{
@@ -82,6 +82,4 @@ const Verification = () => {
       </CardFooter>
     </Card>
   );
-};
-
-export default Verification;
+}

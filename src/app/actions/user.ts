@@ -1,17 +1,33 @@
 'use server';
 
 import { signIn } from '@lib/auth';
-import { sendVerificationEmail } from '@lib/mail';
+import { sendPasswordResetEmail, sendVerificationEmail } from '@lib/mail';
 import { prisma } from '@lib/prisma';
 import { DEFAULT_REDIRECT } from '@lib/routes';
-import { generateVerificationToken } from '@lib/tokens';
+import {
+  generatePasswordResetToken,
+  generateVerificationToken,
+} from '@lib/tokens';
+import {
+  newPasswordSchema,
+  NewPasswordSchema,
+} from '@lib/zod-schema/new-password';
+import {
+  PasswordResetSchema,
+  passwordResetSchema,
+} from '@lib/zod-schema/password-reset';
 import { SignInSchema, signInSchema } from '@lib/zod-schema/sign-in';
 import { SignUpSchema, signUpSchema } from '@lib/zod-schema/sign-up';
 import bcrypt from 'bcryptjs';
 import { AuthError } from 'next-auth';
 
-import { getUserByEmail } from './data';
+import {
+  getPasswordResetTokenByToken,
+  getUserByEmail,
+  getVerifyTokenByToken,
+} from './data';
 
+// register user
 export const register = async (values: SignUpSchema) => {
   const validatedFields = signUpSchema.safeParse(values);
   if (!validatedFields.success) {
@@ -30,14 +46,12 @@ export const register = async (values: SignUpSchema) => {
       hashedPassword: hashedPassword,
     },
   });
-
   const verificationToken = await generateVerificationToken(email);
-
   await sendVerificationEmail(verificationToken.email, verificationToken.token);
-
   return { success: 'Confirmation email sent!' };
 };
 
+// login user
 export const login = async (values: SignInSchema) => {
   const validatedFields = signInSchema.safeParse(values);
   if (!validatedFields.success) {
@@ -75,4 +89,90 @@ export const login = async (values: SignInSchema) => {
     }
     throw error;
   }
+};
+
+// reset password
+export const newPassword = async (
+  values: NewPasswordSchema,
+  token?: string | null
+) => {
+  if (!token) {
+    return { error: 'Token is required!' };
+  }
+  const validatedField = newPasswordSchema.safeParse(values);
+  if (!validatedField.success) {
+    return { error: 'Invalid field!' };
+  }
+  const { password } = validatedField.data;
+  const existingToken = await getPasswordResetTokenByToken(token);
+  if (!existingToken) {
+    return { error: 'Token is invalid!' };
+  }
+  const hasExpired = new Date() > new Date(existingToken.expires);
+  if (hasExpired) {
+    return { error: 'Token has expired!' };
+  }
+  const user = await getUserByEmail(existingToken.email);
+  if (!user) {
+    return { error: 'User does not exist!' };
+  }
+  const handedPassword = await bcrypt.hash(password, 10);
+  await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      hashedPassword: handedPassword,
+    },
+  });
+  await prisma.passwordResetToken.delete({
+    where: {
+      id: existingToken.id,
+    },
+  });
+
+  return { success: 'Password updated!' };
+};
+
+// verify email
+export const newVerification = async (token: string) => {
+  const existingToken = await getVerifyTokenByToken(token);
+  if (!existingToken) {
+    return { error: 'Token does not exist!' };
+  }
+  const hasExpired = new Date(existingToken.expires) < new Date();
+  if (hasExpired) {
+    return { error: 'Token has expired!' };
+  }
+  const user = await getUserByEmail(existingToken.email);
+  if (!user) {
+    return { error: 'User does not exist!' };
+  }
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      emailVerified: new Date(),
+      email: existingToken.email,
+    },
+  });
+  await prisma.verificationToken.delete({
+    where: { id: existingToken.id },
+  });
+  return { success: 'Email verified!' };
+};
+
+// send reset password email
+export const reset = async (values: PasswordResetSchema) => {
+  const validatedFields = passwordResetSchema.safeParse(values);
+  if (!validatedFields.success) {
+    return { error: 'Invalid email!' };
+  }
+  const { email } = validatedFields.data;
+  const existingUser = await getUserByEmail(email);
+  if (!existingUser) {
+    return { error: 'User does not exist!' };
+  }
+  const token = await generatePasswordResetToken(email);
+  await sendPasswordResetEmail(token.email, token.token);
+  return { success: 'Password reset email sent!' };
 };

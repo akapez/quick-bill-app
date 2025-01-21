@@ -31,7 +31,7 @@ import {
 import { Input } from '@components/ui/Input';
 import { Separator } from '@components/ui/Separator';
 
-const SignIn = () => {
+export default function SignIn() {
   const [isPending, startTransition] = useTransition();
   const form = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
@@ -159,6 +159,4 @@ const SignIn = () => {
       </CardFooter>
     </Card>
   );
-};
-
-export default SignIn;
+}
