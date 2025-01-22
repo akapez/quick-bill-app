@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 import { getInvoiceByUserId } from '@actions/invoice';
+import { cn, formatCurrency } from '@lib/utils';
 
 import { Badge } from '@components/ui/Badge';
 import {
@@ -13,11 +14,11 @@ import {
   TableRow,
 } from '@components/ui/Table';
 
-interface DashboardProps {
+interface InvoicesProps {
   userId: string;
 }
 
-export default async function Dashboard({ userId }: DashboardProps) {
+export default async function Invoices({ userId }: InvoicesProps) {
   const invoices = await getInvoiceByUserId(userId);
   return (
     <Table>
@@ -53,7 +54,16 @@ export default async function Dashboard({ userId }: DashboardProps) {
               <Link href={`/invoice/${invoice.id}`} className="block">
                 <Badge
                   variant="outline"
-                  className="border-red-400 text-red-400"
+                  className={cn(
+                    invoice.status === 'OPEN' &&
+                      'border-blue-100 text-blue-500',
+                    invoice.status === 'PAID' &&
+                      'border-green-100 text-green-500',
+                    invoice.status === 'VOID' &&
+                      'border-gray-100 text-gray-500',
+                    invoice.status === 'UNCOLLECTIBLE' &&
+                      'border-red-100 text-red-500'
+                  )}
                 >
                   {invoice.status}
                 </Badge>
@@ -61,7 +71,7 @@ export default async function Dashboard({ userId }: DashboardProps) {
             </TableCell>
             <TableCell className="text-right font-bold">
               <Link href={`/invoice/${invoice.id}`} className="block">
-                ${invoice.amount.toFixed(2)}
+                {formatCurrency(invoice.amount)}
               </Link>
             </TableCell>
           </TableRow>

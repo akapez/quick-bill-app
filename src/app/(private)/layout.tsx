@@ -1,3 +1,5 @@
+import { Fragment } from 'react';
+
 import { auth } from '@lib/auth';
 
 import Header from '@components/common/Header';
@@ -9,12 +11,12 @@ export default async function PrivateLayout({
 }) {
   const session = await auth();
   return (
-    <div>
+    <Fragment>
       <Header
         name={session?.user.name || ''}
         imageUrl={session?.user.image || ''}
       />
       {children}
-    </div>
+    </Fragment>
   );
 }

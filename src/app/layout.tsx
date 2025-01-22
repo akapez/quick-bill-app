@@ -30,7 +30,7 @@ export default async function RootLayout({
   const session = await auth();
   return (
     <SessionProvider session={session}>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body className={`${roboto.className} antialiased`}>
           {children}
           <Footer />
