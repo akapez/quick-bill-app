@@ -13,6 +13,7 @@ export default async function PrivateLayout({
   return (
     <Fragment>
       <Header
+        id={session?.user.id || null}
         name={session?.user.name || ''}
         imageUrl={session?.user.image || ''}
       />

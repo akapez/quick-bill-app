@@ -1,9 +1,6 @@
 import { z } from 'zod';
 
 export const invoiceSchema = z.object({
-  name: z.string().trim().min(3, {
-    message: 'Name must be at least three characters.',
-  }),
   email: z.string().trim().email({
     message: 'Invalid email address.',
   }),

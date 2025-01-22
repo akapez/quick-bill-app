@@ -26,8 +26,8 @@ export default async function Invoices({ userId }: InvoicesProps) {
       <TableHeader>
         <TableRow>
           <TableHead>Date</TableHead>
-          <TableHead>Customer</TableHead>
-          <TableHead>Email</TableHead>
+          <TableHead>Sender</TableHead>
+          <TableHead>Receiver</TableHead>
           <TableHead>Status</TableHead>
           <TableHead className="text-right">Amount</TableHead>
         </TableRow>
@@ -40,14 +40,20 @@ export default async function Invoices({ userId }: InvoicesProps) {
                 {new Date(invoice.createdAt).toLocaleDateString()}
               </Link>
             </TableCell>
-            <TableCell className="font-bold">
+            <TableCell
+              className={userId !== invoice.sender.id ? 'font-bold' : undefined}
+            >
               <Link href={`/invoice/${invoice.id}`} className="block">
-                {invoice.billingName}
+                {invoice.sender.name}
               </Link>
             </TableCell>
-            <TableCell>
+            <TableCell
+              className={
+                userId !== invoice.receiver.id ? 'font-bold' : undefined
+              }
+            >
               <Link href={`/invoice/${invoice.id}`} className="block">
-                {invoice.billingEmail}
+                {invoice.receiver.name}
               </Link>
             </TableCell>
             <TableCell>

@@ -11,7 +11,7 @@ export const createInvoice = async (values: InvoiceSchema, userId: string) => {
   if (!validatedFields.success) {
     return { error: 'Invalid fields!' };
   }
-  const { name, email, description, amount } = validatedFields.data;
+  const { email, description, amount } = validatedFields.data;
   try {
     if (!userId) {
       return { error: 'Unauthorized!' };
@@ -42,8 +42,6 @@ export const createInvoice = async (values: InvoiceSchema, userId: string) => {
         senderId: userId,
         receiverId: receiver.id,
         invoiceNumber,
-        billingEmail: receiver.email || email,
-        billingName: name,
         description,
         amount,
       },
@@ -59,6 +57,24 @@ export const getInvoiceByUserId = async (userId: string) => {
   try {
     const invoices = await prisma.invoice.findMany({
       where: { OR: [{ senderId: userId }, { receiverId: userId }] },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
     return invoices;
@@ -77,16 +93,58 @@ export const getInvoiceById = async (
   }
   try {
     const invoice = await prisma.invoice.findFirst({
-      where: {
-        id,
-        OR: [{ senderId: userId }, { receiverId: userId }],
+      where: { id },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
       },
     });
-
     if (!invoice) {
       return null;
     }
+    return invoice;
+  } catch {
+    return null;
+  }
+};
 
+//get payment invoice
+export const getPaymentInvoiceById = async (id: string) => {
+  try {
+    const invoice = await prisma.invoice.findFirst({
+      where: { id },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+    if (!invoice) {
+      return null;
+    }
     return invoice;
   } catch {
     return null;

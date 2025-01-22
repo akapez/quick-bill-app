@@ -1,4 +1,8 @@
-export const PUBLIC_ROUTES = ['/', '/auth/new-verification'];
+export const PUBLIC_ROUTES = [
+  '/',
+  '/auth/new-verification',
+  /^\/invoice\/([^/]+)\/payment$/,
+];
 
 export const AUTH_ROUTES = [
   '/sign-in',

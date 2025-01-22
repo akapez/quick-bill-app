@@ -30,7 +30,6 @@ export default function NewInvoice({ userId }: NewInvoiceProps) {
   const form = useForm<InvoiceSchema>({
     resolver: zodResolver(invoiceSchema),
     defaultValues: {
-      name: '',
       email: '',
       amount: 0,
       description: '',
@@ -57,24 +56,6 @@ export default function NewInvoice({ userId }: NewInvoiceProps) {
       <Form {...form}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
           <div className="space-y-2">
-            <FormField
-              control={control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="name">Billing Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      id="name"
-                      type="text"
-                      placeholder="Sam Smith"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
             <FormField
               control={control}
               name="email"

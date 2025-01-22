@@ -11,12 +11,17 @@ import NextAuth from 'next-auth';
 
 const { auth } = NextAuth(authConfig);
 
+const isPublicRoute = (pathname: string): boolean => {
+  return PUBLIC_ROUTES.some((route) =>
+    route instanceof RegExp ? route.test(pathname) : route === pathname
+  );
+};
+
 export default auth((req) => {
   const { nextUrl } = req;
   const isLoggedIn = !!req.auth;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(API_AUTH_PREFIX);
-  const isPublicRoute = PUBLIC_ROUTES.includes(nextUrl.pathname);
   const isAuthRoute = AUTH_ROUTES.includes(nextUrl.pathname);
 
   if (isApiAuthRoute) {
@@ -30,7 +35,7 @@ export default auth((req) => {
     return NextResponse.next();
   }
 
-  if (!isLoggedIn && !isPublicRoute) {
+  if (!isLoggedIn && !isPublicRoute(nextUrl.pathname)) {
     return NextResponse.redirect(new URL('/sign-in', nextUrl));
   }
 

@@ -147,12 +147,12 @@ export default function SignIn() {
         <GoogleButton />
       </CardContent>
       <CardFooter
-        id="sign-up-card-footer"
+        id="sign-in-card-footer"
         className="flex justify-center text-sm"
       >
         Don&apos;t have an account?
         <Link href="/sign-up">
-          <Button id="sign-up-btn" variant="link">
+          <Button id="register-btn" variant="link">
             Register
           </Button>
         </Link>
