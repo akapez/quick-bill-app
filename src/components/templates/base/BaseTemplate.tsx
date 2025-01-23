@@ -2,8 +2,6 @@ export interface IBaseTemplateProps {
   sampleTextProp: string;
 }
 
-const BaseTemplate: React.FC<IBaseTemplateProps> = ({ sampleTextProp }) => {
+export default function BaseTemplate({ sampleTextProp }: IBaseTemplateProps) {
   return <div>{sampleTextProp}</div>;
-};
-
-export default BaseTemplate;
+}
