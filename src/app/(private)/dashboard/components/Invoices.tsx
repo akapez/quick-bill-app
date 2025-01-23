@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { getInvoiceByUserId } from '@actions/invoice';
+import { getInvoicesByUserId } from '@actions/invoice';
 import { cn, formatCurrency } from '@lib/utils';
 
 import { Badge } from '@components/ui/Badge';
@@ -19,7 +19,7 @@ interface InvoicesProps {
 }
 
 export default async function Invoices({ userId }: InvoicesProps) {
-  const invoices = await getInvoiceByUserId(userId);
+  const invoices = await getInvoicesByUserId(userId);
   return (
     <Table>
       <TableCaption>A list of your recent invoices.</TableCaption>
@@ -61,6 +61,7 @@ export default async function Invoices({ userId }: InvoicesProps) {
                 <Badge
                   variant="outline"
                   className={cn(
+                    'flex w-14 justify-center',
                     invoice.status === 'OPEN' &&
                       'border-blue-100 text-blue-500',
                     invoice.status === 'PAID' &&

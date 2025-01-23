@@ -7,6 +7,7 @@ import { auth } from '@lib/auth';
 import BackButton from '@components/common/BackButton';
 
 import Invoice from './components/Invoice';
+import InvoiceStatus from './components/InvoiceStatus';
 import Menu from './components/Menu';
 
 export const metadata: Metadata = {
@@ -30,7 +31,16 @@ export default async function InvoicePage({
       <BackButton href="/dashboard" />
       <div className="flex max-w-6xl items-center justify-between">
         <h1 className="my-4 text-left text-3xl font-bold">Invoice Details</h1>
-        <Menu id={invoice.id} />
+        <div className="flex flex-row space-x-2">
+          {invoice.sender.id === session?.user.id && (
+            <InvoiceStatus id={invoice.id} currentStatus={invoice.status} />
+          )}
+          <Menu
+            id={invoice.id}
+            senderId={invoice.sender.id}
+            userId={session?.user.id}
+          />
+        </div>
       </div>
       <Invoice invoice={invoice} />
     </div>

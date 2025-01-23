@@ -1,5 +1,10 @@
 import { prisma } from '@lib/prisma';
-import { PasswordResetToken, User, VerificationToken } from '@prisma/client';
+import {
+  Invoice,
+  PasswordResetToken,
+  User,
+  VerificationToken,
+} from '@prisma/client';
 
 export const getUserByEmail = async (email: string): Promise<User | null> => {
   try {
@@ -78,6 +83,15 @@ export const getPasswordResetTokenByEmail = async (
     });
 
     return passwordResetToken;
+  } catch {
+    return null;
+  }
+};
+
+export const getInvoiceById = async (id: string): Promise<Invoice | null> => {
+  try {
+    const invoice = await prisma.invoice.findUnique({ where: { id } });
+    return invoice;
   } catch {
     return null;
   }

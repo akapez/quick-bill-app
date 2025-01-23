@@ -5,12 +5,14 @@ type User = {
   image: string | null;
 };
 
+export type Status = 'OPEN' | 'PAID' | 'VOID' | 'UNCOLLECTIBLE';
+
 export type Invoice = {
   id: string;
   senderId: string;
   receiverId: string;
   invoiceNumber: string;
-  status: 'OPEN' | 'PAID' | 'VOID' | 'UNCOLLECTIBLE';
+  status: Status;
   amount: number;
   description: string;
   createdAt: Date;

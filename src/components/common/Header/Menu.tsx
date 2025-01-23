@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 
-import { LogOut, User } from 'lucide-react';
+import { ChartNoAxesCombined, LogOut, User } from 'lucide-react';
 import { signOut } from 'next-auth/react';
 
 import {
@@ -26,7 +26,14 @@ export default function Menu({ children, name }: MenuProps) {
       <DropdownMenuContent>
         <DropdownMenuLabel>{`${name}`}</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <Link href="/manage">
+        <Link href="/dashboard">
+          <DropdownMenuItem className="cursor-pointer">
+            <ChartNoAxesCombined />
+            <span>Dashboard</span>
+          </DropdownMenuItem>
+        </Link>
+        <DropdownMenuSeparator />
+        <Link href="/profile">
           <DropdownMenuItem className="cursor-pointer">
             <User />
             <span>Profile</span>

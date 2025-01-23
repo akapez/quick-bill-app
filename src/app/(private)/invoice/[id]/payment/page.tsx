@@ -1,14 +1,10 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getPaymentInvoiceById } from '@actions/invoice';
+import { getPaymentInvoiceById, updateInvoiceStatus } from '@actions/invoice';
+import { verifyPayment } from '@actions/stripe';
 import { cn, formatCurrency } from '@lib/utils';
-import {
-  CalendarIcon,
-  CircleCheckIcon,
-  CreditCard,
-  UserIcon,
-} from 'lucide-react';
+import { CalendarIcon, CircleCheckIcon, UserIcon } from 'lucide-react';
 
 import { Badge } from '@components/ui/Badge';
 import { Button } from '@components/ui/Button';
@@ -22,24 +18,47 @@ import {
 } from '@components/ui/Card';
 import { Separator } from '@components/ui/Separator';
 
+import ErrorMessage from './components/ErrorMessage';
+import PaymentButton from './components/PaymentButton';
+
 export const metadata: Metadata = {
   title: 'Payment Details',
 };
 
+interface PaymentPageProps {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ status: string; session_id: string }>;
+}
+
 export default async function PaymentPage({
   params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+  searchParams,
+}: PaymentPageProps) {
   const invoiceId = (await params).id;
+  const status = (await searchParams).status;
+  const sessionId = (await searchParams).session_id;
   const invoice = await getPaymentInvoiceById(invoiceId);
+
+  const isSuccess = sessionId && status === 'success';
+  const isCanceled = status === 'canceled';
+  let isError = isSuccess && !sessionId;
+
+  if (isSuccess) {
+    const { payment_status } = await verifyPayment(sessionId);
+    if (payment_status !== 'paid') {
+      isError = true;
+    } else {
+      console.log('fire');
+      await updateInvoiceStatus(invoiceId, 'PAID', false);
+    }
+  }
 
   if (!invoice) {
     notFound();
   }
   return (
     <div className="mx-3 my-20 flex flex-col items-center justify-center md:px-6 xl:px-36">
-      <Card className="w-full max-w-6xl">
+      <Card className="mb-5 w-full max-w-6xl">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
@@ -93,23 +112,33 @@ export default async function PaymentPage({
           </div>
         </CardContent>
         <Separator />
-        <CardFooter className="flex justify-end py-5">
-          {invoice.status === 'OPEN' && (
-            <form>
-              <Button className="bg-blue-500 text-white hover:bg-blue-600 hover:text-white">
-                <CreditCard /> Pay
-              </Button>
-            </form>
-          )}
-          {invoice.status === 'PAID' && (
-            <form>
-              <Button disabled className="bg-green-600">
-                <CircleCheckIcon /> Paid
-              </Button>
-            </form>
-          )}
-        </CardFooter>
+        {invoice.status === 'OPEN' && (
+          <CardFooter className="flex justify-end py-5">
+            <PaymentButton invoiceId={invoice.id} />
+          </CardFooter>
+        )}
+        {invoice.status === 'PAID' && (
+          <CardFooter className="flex justify-end py-5">
+            <Button disabled className="bg-green-600">
+              <CircleCheckIcon /> Paid
+            </Button>
+          </CardFooter>
+        )}
       </Card>
+      {isError && (
+        <ErrorMessage
+          title="Error"
+          description="Something went wrong in payment. Please try again."
+          variant="destructive"
+        />
+      )}
+      {isCanceled && (
+        <ErrorMessage
+          title="Warning"
+          description="Payment was canceled. Please try again."
+          variant="default"
+        />
+      )}
     </div>
   );
 }

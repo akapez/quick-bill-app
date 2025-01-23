@@ -1,5 +1,8 @@
 'use server';
 
+import { revalidatePath } from 'next/cache';
+
+import { Status } from '@definitions/invoice';
 import { prisma } from '@lib/prisma';
 import { invoiceSchema, InvoiceSchema } from '@lib/zod-schema/invoice';
 
@@ -52,8 +55,8 @@ export const createInvoice = async (values: InvoiceSchema, userId: string) => {
   }
 };
 
-// get invoice by user id
-export const getInvoiceByUserId = async (userId: string) => {
+// get invoices by user id
+export const getInvoicesByUserId = async (userId: string) => {
   try {
     const invoices = await prisma.invoice.findMany({
       where: { OR: [{ senderId: userId }, { receiverId: userId }] },
@@ -93,7 +96,7 @@ export const getInvoiceById = async (
   }
   try {
     const invoice = await prisma.invoice.findFirst({
-      where: { id },
+      where: { id, OR: [{ senderId: userId }, { receiverId: userId }] },
       include: {
         sender: {
           select: {
@@ -149,4 +152,26 @@ export const getPaymentInvoiceById = async (id: string) => {
   } catch {
     return null;
   }
+};
+
+// update invoice status
+export const updateInvoiceStatus = async (
+  id: string,
+  status: Status,
+  revalidate: boolean
+) => {
+  if (!id) {
+    return { error: 'Invoice id not found!' };
+  }
+  await prisma.invoice.update({
+    where: { id: id },
+    data: {
+      status: status,
+    },
+  });
+  if (revalidate) {
+    revalidatePath(`/invoice/${id}`, 'page');
+  }
+
+  return { success: 'Status updated!' };
 };

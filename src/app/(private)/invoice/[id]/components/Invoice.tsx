@@ -13,6 +13,7 @@ import {
 } from '@components/ui/Card';
 
 export default function InvoiceDetails({ invoice }: { invoice: Invoice }) {
+  const fallbackLetter = invoice.sender.name?.charAt(0).toUpperCase();
   return (
     <Card className="w-full max-w-6xl">
       <CardHeader>
@@ -48,9 +49,7 @@ export default function InvoiceDetails({ invoice }: { invoice: Invoice }) {
                   src={invoice.sender.image || undefined}
                   alt={invoice.sender.name || 'Sender'}
                 />
-                <AvatarFallback>
-                  {invoice.sender.name?.charAt(0)}
-                </AvatarFallback>
+                <AvatarFallback>{fallbackLetter}</AvatarFallback>
               </Avatar>
               <div>
                 <p className="font-medium">{invoice.sender.name}</p>
