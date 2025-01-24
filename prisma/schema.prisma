@@ -18,8 +18,8 @@ enum UserRole {
 enum Status {
   OPEN
   PAID
-  VOID
-  UNCOLLECTIBLE
+  UNPAID
+  REJECT
 }
 
 model User {

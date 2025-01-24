@@ -7,9 +7,9 @@ import { useSearchParams } from 'next/navigation';
 import { newPassword } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  NewPasswordSchema,
-  newPasswordSchema,
-} from '@lib/zod-schema/new-password';
+  PasswordSchema,
+  passwordSchema,
+} from '@lib/zod-schema/password.schema';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -37,8 +37,8 @@ export default function NewPassword() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
   const [isPending, startTransition] = useTransition();
-  const form = useForm<NewPasswordSchema>({
-    resolver: zodResolver(newPasswordSchema),
+  const form = useForm<PasswordSchema>({
+    resolver: zodResolver(passwordSchema),
     defaultValues: {
       password: '',
     },
@@ -46,7 +46,7 @@ export default function NewPassword() {
 
   const { handleSubmit, control, reset } = form;
 
-  const onSubmit: SubmitHandler<NewPasswordSchema> = async (data) => {
+  const onSubmit: SubmitHandler<PasswordSchema> = async (data) => {
     startTransition(() => {
       newPassword(data, token).then((data) => {
         if (!data) return;

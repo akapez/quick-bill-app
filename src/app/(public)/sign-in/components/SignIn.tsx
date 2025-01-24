@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 import { login } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SignInSchema, signInSchema } from '@lib/zod-schema/sign-in';
+import { LoginSchema, loginSchema } from '@lib/zod-schema/login.schema';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -33,8 +33,8 @@ import { Separator } from '@components/ui/Separator';
 
 export default function SignIn() {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<SignInSchema>({
-    resolver: zodResolver(signInSchema),
+  const form = useForm<LoginSchema>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
       password: '',
@@ -43,7 +43,7 @@ export default function SignIn() {
 
   const { handleSubmit, control } = form;
 
-  const onSubmit: SubmitHandler<SignInSchema> = async (data) => {
+  const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     startTransition(() => {
       login(data).then((data) => {
         if (!data) return;

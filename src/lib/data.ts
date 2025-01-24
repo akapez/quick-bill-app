@@ -8,11 +8,11 @@ export const INVOICE_STATUSES = [
     label: 'Paid',
   },
   {
-    id: 'VOID',
-    label: 'Void',
+    id: 'UNPAID',
+    label: 'Unpaid',
   },
   {
-    id: 'UNCOLLECTIBLE',
-    label: 'Uncollectible',
+    id: 'REJECT',
+    label: 'Reject',
   },
 ];

@@ -4,9 +4,14 @@ import { revalidatePath } from 'next/cache';
 
 import { Status } from '@definitions/invoice';
 import { prisma } from '@lib/prisma';
-import { invoiceSchema, InvoiceSchema } from '@lib/zod-schema/invoice';
+import { getYearStartAndEndDates } from '@lib/utils';
+import { invoiceSchema, InvoiceSchema } from '@lib/zod-schema/invoice.schema';
 
-import { getUserByEmail, getUserById } from './data';
+import { getInvoiceBySenderId, getUserByEmail, getUserById } from './data';
+import { sendInvoiceEmail } from './mail';
+
+const currentYear = new Date().getFullYear();
+const { startDate, endDate } = getYearStartAndEndDates(currentYear);
 
 // create a new invoice
 export const createInvoice = async (values: InvoiceSchema, userId: string) => {
@@ -40,7 +45,7 @@ export const createInvoice = async (values: InvoiceSchema, userId: string) => {
     }
     const invoiceNumber = `INV${newIdNumber.toString().padStart(3, '0')}`;
 
-    await prisma.invoice.create({
+    const result = await prisma.invoice.create({
       data: {
         senderId: userId,
         receiverId: receiver.id,
@@ -49,6 +54,12 @@ export const createInvoice = async (values: InvoiceSchema, userId: string) => {
         amount,
       },
     });
+    await sendInvoiceEmail(
+      result.id,
+      result.invoiceNumber,
+      receiver.name || '@user',
+      email
+    );
     return { success: 'Invoice created!' };
   } catch {
     return { error: 'Something went wrong!' };
@@ -57,6 +68,9 @@ export const createInvoice = async (values: InvoiceSchema, userId: string) => {
 
 // get invoices by user id
 export const getInvoicesByUserId = async (userId: string) => {
+  if (!userId) {
+    return [];
+  }
   try {
     const invoices = await prisma.invoice.findMany({
       where: { OR: [{ senderId: userId }, { receiverId: userId }] },
@@ -158,8 +172,31 @@ export const getPaymentInvoiceById = async (id: string) => {
 export const updateInvoiceStatus = async (
   id: string,
   status: Status,
-  revalidate: boolean
+  userId: string | undefined
 ) => {
+  if (!id || !userId) {
+    return { error: 'Unauthorized!' };
+  }
+  try {
+    const invoice = getInvoiceBySenderId(id, userId);
+    if (!invoice) {
+      return { error: 'Unauthorized!' };
+    }
+    await prisma.invoice.update({
+      where: { id: id },
+      data: {
+        status: status,
+      },
+    });
+    revalidatePath(`/invoice/${id}`, 'page');
+    return { success: 'Status updated!' };
+  } catch {
+    return { success: 'Something went wrong!' };
+  }
+};
+
+//update payment status (public)
+export const updatePaymentStatus = async (id: string, status: Status) => {
   if (!id) {
     return { error: 'Invoice id not found!' };
   }
@@ -169,9 +206,84 @@ export const updateInvoiceStatus = async (
       status: status,
     },
   });
-  if (revalidate) {
-    revalidatePath(`/invoice/${id}`, 'page');
+  return { success: 'Status updated!' };
+};
+
+//get statics
+export const getTotalRevenue = async (userId: string) => {
+  if (!userId) {
+    return 0;
+  }
+  try {
+    const totalRevenue = await prisma.invoice.aggregate({
+      _sum: {
+        amount: true,
+      },
+      where: {
+        senderId: userId,
+        status: 'PAID',
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+
+    return totalRevenue._sum.amount || 0;
+  } catch {
+    return 0;
+  }
+};
+
+export const getTotalExpenses = async (userId: string) => {
+  if (!userId) {
+    return 0;
+  }
+  try {
+    const totalRevenue = await prisma.invoice.aggregate({
+      _sum: {
+        amount: true,
+      },
+      where: {
+        receiverId: userId,
+        status: 'PAID',
+        createdAt: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+
+    return totalRevenue._sum.amount || 0;
+  } catch {
+    return 0;
+  }
+};
+
+export const getInvoiceCounts = async (userId: string) => {
+  if (!userId) {
+    return { open: 0, paid: 0 };
   }
 
-  return { success: 'Status updated!' };
+  try {
+    const openInvoiceCount = await prisma.invoice.count({
+      where: {
+        OR: [
+          { senderId: userId, status: 'OPEN' },
+          { receiverId: userId, status: 'OPEN' },
+        ],
+      },
+    });
+
+    const paidInvoiceCount = await prisma.invoice.count({
+      where: {
+        receiverId: userId,
+        status: 'PAID',
+      },
+    });
+
+    return { open: openInvoiceCount, paid: paidInvoiceCount };
+  } catch {
+    return { open: 0, paid: 0 };
+  }
 };

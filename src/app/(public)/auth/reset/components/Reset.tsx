@@ -5,10 +5,7 @@ import Link from 'next/link';
 
 import { reset } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  PasswordResetSchema,
-  passwordResetSchema,
-} from '@lib/zod-schema/password-reset';
+import { EmailSchema, emailSchema } from '@lib/zod-schema/email.schema';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -34,8 +31,8 @@ import { Input } from '@components/ui/Input';
 
 export default function PasswordReset() {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<PasswordResetSchema>({
-    resolver: zodResolver(passwordResetSchema),
+  const form = useForm<EmailSchema>({
+    resolver: zodResolver(emailSchema),
     defaultValues: {
       email: '',
     },
@@ -43,7 +40,7 @@ export default function PasswordReset() {
 
   const { handleSubmit, control } = form;
 
-  const onSubmit: SubmitHandler<PasswordResetSchema> = async (data) => {
+  const onSubmit: SubmitHandler<EmailSchema> = async (data) => {
     startTransition(() => {
       reset(data).then((data) => {
         if (!data) return;

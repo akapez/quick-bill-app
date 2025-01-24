@@ -96,3 +96,20 @@ export const getInvoiceById = async (id: string): Promise<Invoice | null> => {
     return null;
   }
 };
+
+export const getInvoiceBySenderId = async (
+  id: string,
+  userId: string
+): Promise<Invoice | null> => {
+  try {
+    const invoice = await prisma.invoice.findFirst({
+      where: {
+        id,
+        senderId: userId,
+      },
+    });
+    return invoice;
+  } catch {
+    return null;
+  }
+};

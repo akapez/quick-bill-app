@@ -11,3 +11,9 @@ export function formatCurrency(amount: number): string {
     currency: 'USD',
   }).format(amount);
 }
+
+export const getYearStartAndEndDates = (year: number) => {
+  const startDate = new Date(`${year}-01-01T00:00:00Z`);
+  const endDate = new Date(`${year}-12-31T23:59:59Z`);
+  return { startDate, endDate };
+};

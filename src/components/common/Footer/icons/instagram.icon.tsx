@@ -1,7 +1,7 @@
 export function InstagramIcon() {
   return (
     <svg
-      className="h-6 w-6 text-gray-800"
+      className="h-6 w-6 text-gray-400"
       aria-hidden="true"
       xmlns="http://www.w3.org/2000/svg"
       width="24"

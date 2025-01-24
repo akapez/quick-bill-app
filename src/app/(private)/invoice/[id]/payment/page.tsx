@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-import { getPaymentInvoiceById, updateInvoiceStatus } from '@actions/invoice';
+import { getPaymentInvoiceById, updatePaymentStatus } from '@actions/invoice';
 import { verifyPayment } from '@actions/stripe';
 import { cn, formatCurrency } from '@lib/utils';
 import { CalendarIcon, CircleCheckIcon, UserIcon } from 'lucide-react';
@@ -18,7 +18,7 @@ import {
 } from '@components/ui/Card';
 import { Separator } from '@components/ui/Separator';
 
-import ErrorMessage from './components/ErrorMessage';
+import Message from './components/Message';
 import PaymentButton from './components/PaymentButton';
 
 export const metadata: Metadata = {
@@ -43,13 +43,17 @@ export default async function PaymentPage({
   const isCanceled = status === 'canceled';
   let isError = isSuccess && !sessionId;
 
+  let displayStatus = invoice?.status;
+
   if (isSuccess) {
     const { payment_status } = await verifyPayment(sessionId);
     if (payment_status !== 'paid') {
       isError = true;
     } else {
-      console.log('fire');
-      await updateInvoiceStatus(invoiceId, 'PAID', false);
+      const result = await updatePaymentStatus(invoiceId, 'PAID');
+      if (result.success) {
+        displayStatus = 'PAID';
+      }
     }
   }
 
@@ -72,13 +76,13 @@ export default async function PaymentPage({
             </div>
             <Badge
               className={cn(
-                invoice.status === 'OPEN' && 'bg-blue-100 text-blue-500',
-                invoice.status === 'PAID' && 'bg-green-100 text-green-500',
-                invoice.status === 'VOID' && 'bg-gray-100 text-gray-500',
-                invoice.status === 'UNCOLLECTIBLE' && 'bg-red-100 text-red-500'
+                displayStatus === 'OPEN' && 'bg-blue-100 text-blue-500',
+                displayStatus === 'PAID' && 'bg-green-100 text-green-500',
+                displayStatus === 'UNPAID' && 'bg-gray-100 text-gray-500',
+                displayStatus === 'REJECT' && 'bg-red-100 text-red-500'
               )}
             >
-              {invoice.status}
+              {displayStatus}
             </Badge>
           </div>
         </CardHeader>
@@ -112,12 +116,12 @@ export default async function PaymentPage({
           </div>
         </CardContent>
         <Separator />
-        {invoice.status === 'OPEN' && (
+        {displayStatus === 'OPEN' && (
           <CardFooter className="flex justify-end py-5">
             <PaymentButton invoiceId={invoice.id} />
           </CardFooter>
         )}
-        {invoice.status === 'PAID' && (
+        {displayStatus === 'PAID' && (
           <CardFooter className="flex justify-end py-5">
             <Button disabled className="bg-green-600">
               <CircleCheckIcon /> Paid
@@ -126,14 +130,14 @@ export default async function PaymentPage({
         )}
       </Card>
       {isError && (
-        <ErrorMessage
+        <Message
           title="Error"
           description="Something went wrong in payment. Please try again."
           variant="destructive"
         />
       )}
       {isCanceled && (
-        <ErrorMessage
+        <Message
           title="Warning"
           description="Payment was canceled. Please try again."
           variant="default"

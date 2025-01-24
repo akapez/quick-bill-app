@@ -1,23 +1,22 @@
 'use server';
 
 import { signIn } from '@lib/auth';
-import { sendPasswordResetEmail, sendVerificationEmail } from '@lib/mail';
 import { prisma } from '@lib/prisma';
 import { DEFAULT_REDIRECT } from '@lib/routes';
 import {
   generatePasswordResetToken,
   generateVerificationToken,
 } from '@lib/tokens';
+import { EmailSchema, emailSchema } from '@lib/zod-schema/email.schema';
+import { LoginSchema, loginSchema } from '@lib/zod-schema/login.schema';
 import {
-  newPasswordSchema,
-  NewPasswordSchema,
-} from '@lib/zod-schema/new-password';
+  PasswordSchema,
+  passwordSchema,
+} from '@lib/zod-schema/password.schema';
 import {
-  PasswordResetSchema,
-  passwordResetSchema,
-} from '@lib/zod-schema/password-reset';
-import { SignInSchema, signInSchema } from '@lib/zod-schema/sign-in';
-import { SignUpSchema, signUpSchema } from '@lib/zod-schema/sign-up';
+  RegisterSchema,
+  registerSchema,
+} from '@lib/zod-schema/register.schema';
 import bcrypt from 'bcryptjs';
 import { AuthError } from 'next-auth';
 
@@ -26,10 +25,11 @@ import {
   getUserByEmail,
   getVerifyTokenByToken,
 } from './data';
+import { sendPasswordResetEmail, sendVerificationEmail } from './mail';
 
 // register user
-export const register = async (values: SignUpSchema) => {
-  const validatedFields = signUpSchema.safeParse(values);
+export const register = async (values: RegisterSchema) => {
+  const validatedFields = registerSchema.safeParse(values);
   if (!validatedFields.success) {
     return { error: 'Invalid fields!' };
   }
@@ -47,13 +47,17 @@ export const register = async (values: SignUpSchema) => {
     },
   });
   const verificationToken = await generateVerificationToken(email);
-  await sendVerificationEmail(verificationToken.email, verificationToken.token);
+  await sendVerificationEmail(
+    name,
+    verificationToken.email,
+    verificationToken.token
+  );
   return { success: 'Confirmation email sent!' };
 };
 
 // login user
-export const login = async (values: SignInSchema) => {
-  const validatedFields = signInSchema.safeParse(values);
+export const login = async (values: LoginSchema) => {
+  const validatedFields = loginSchema.safeParse(values);
   if (!validatedFields.success) {
     return { error: 'Invalid fields!' };
   }
@@ -67,6 +71,7 @@ export const login = async (values: SignInSchema) => {
       existingUser.email
     );
     await sendVerificationEmail(
+      existingUser.name || '@user',
       verificationToken.email,
       verificationToken.token
     );
@@ -93,13 +98,13 @@ export const login = async (values: SignInSchema) => {
 
 // reset password
 export const newPassword = async (
-  values: NewPasswordSchema,
+  values: PasswordSchema,
   token?: string | null
 ) => {
   if (!token) {
     return { error: 'Token is required!' };
   }
-  const validatedField = newPasswordSchema.safeParse(values);
+  const validatedField = passwordSchema.safeParse(values);
   if (!validatedField.success) {
     return { error: 'Invalid field!' };
   }
@@ -162,8 +167,8 @@ export const newVerification = async (token: string) => {
 };
 
 // send reset password email
-export const reset = async (values: PasswordResetSchema) => {
-  const validatedFields = passwordResetSchema.safeParse(values);
+export const reset = async (values: EmailSchema) => {
+  const validatedFields = emailSchema.safeParse(values);
   if (!validatedFields.success) {
     return { error: 'Invalid email!' };
   }
@@ -173,6 +178,10 @@ export const reset = async (values: PasswordResetSchema) => {
     return { error: 'User does not exist!' };
   }
   const token = await generatePasswordResetToken(email);
-  await sendPasswordResetEmail(token.email, token.token);
+  await sendPasswordResetEmail(
+    existingUser.name || '@user',
+    token.email,
+    token.token
+  );
   return { success: 'Password reset email sent!' };
 };

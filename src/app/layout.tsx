@@ -5,6 +5,7 @@ import './globals.css';
 
 import { auth } from '@lib/auth';
 import { SessionProvider } from '@providers/session.provider';
+import { ThemeProvider } from '@providers/theme.provider';
 import { ToasterProvider } from '@providers/toast.provider';
 
 import Footer from '@components/common/Footer';
@@ -19,7 +20,7 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: 'QuickBill',
   description:
-    'Streamline your invoicing process with ease. Create, send, and manage invoices in seconds with our user-friendly app. ',
+    'Streamline your invoicing process with ease. Create, send, and manage invoices in seconds with our user-friendly app.',
 };
 
 export default async function RootLayout({
@@ -32,9 +33,16 @@ export default async function RootLayout({
     <SessionProvider session={session}>
       <html lang="en" suppressHydrationWarning>
         <body className={`${roboto.className} antialiased`}>
-          {children}
-          <Footer />
-          <ToasterProvider />
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            {children}
+            <Footer />
+            <ToasterProvider />
+          </ThemeProvider>
         </body>
       </html>
     </SessionProvider>

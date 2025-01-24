@@ -31,8 +31,8 @@ export default function InvoiceDetails({ invoice }: { invoice: Invoice }) {
             className={cn(
               invoice.status === 'OPEN' && 'bg-blue-100 text-blue-500',
               invoice.status === 'PAID' && 'bg-green-100 text-green-500',
-              invoice.status === 'VOID' && 'bg-gray-100 text-gray-500',
-              invoice.status === 'UNCOLLECTIBLE' && 'bg-red-100 text-red-500'
+              invoice.status === 'UNPAID' && 'bg-gray-100 text-gray-500',
+              invoice.status === 'REJECT' && 'bg-red-100 text-red-500'
             )}
           >
             {invoice.status}

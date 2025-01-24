@@ -3,7 +3,7 @@
 import { Fragment } from 'react';
 import Link from 'next/link';
 
-import { CreditCard, EllipsisVertical, Trash2 } from 'lucide-react';
+import { CreditCard, EllipsisVertical, FileText } from 'lucide-react';
 
 import { Button } from '@components/ui/Button';
 import {
@@ -21,7 +21,6 @@ interface MenuProps {
 }
 
 export default function Menu({ id, senderId, userId }: MenuProps) {
-  // const [openDeleteModal, setOpenDeleteModal] = useState(false);
   return (
     <Fragment>
       <DropdownMenu>
@@ -33,12 +32,9 @@ export default function Menu({ id, senderId, userId }: MenuProps) {
         <DropdownMenuContent>
           {senderId === userId && (
             <Fragment>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => setOpenDeleteModal(true)}
-              >
-                <Trash2 />
-                <span>Delete Invoice</span>
+              <DropdownMenuItem className="cursor-pointer">
+                <FileText />
+                <span>Download PDF</span>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
             </Fragment>

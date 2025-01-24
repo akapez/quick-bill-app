@@ -4,7 +4,7 @@ import { useTransition } from 'react';
 
 import { createInvoice } from '@actions/invoice';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { InvoiceSchema, invoiceSchema } from '@lib/zod-schema/invoice';
+import { InvoiceSchema, invoiceSchema } from '@lib/zod-schema/invoice.schema';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';

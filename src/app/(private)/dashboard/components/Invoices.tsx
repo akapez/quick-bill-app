@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-import { getInvoicesByUserId } from '@actions/invoice';
+import { Invoice } from '@definitions/invoice';
 import { cn, formatCurrency } from '@lib/utils';
 
 import { Badge } from '@components/ui/Badge';
@@ -15,16 +15,17 @@ import {
 } from '@components/ui/Table';
 
 interface InvoicesProps {
+  invoices: Invoice[];
   userId: string;
 }
 
-export default async function Invoices({ userId }: InvoicesProps) {
-  const invoices = await getInvoicesByUserId(userId);
+export default async function Invoices({ invoices, userId }: InvoicesProps) {
   return (
     <Table>
       <TableCaption>A list of your recent invoices.</TableCaption>
       <TableHeader>
         <TableRow>
+          <TableHead>Invoice No.</TableHead>
           <TableHead>Date</TableHead>
           <TableHead>Sender</TableHead>
           <TableHead>Receiver</TableHead>
@@ -35,6 +36,11 @@ export default async function Invoices({ userId }: InvoicesProps) {
       <TableBody>
         {invoices.map((invoice) => (
           <TableRow key={invoice.id}>
+            <TableCell>
+              <Link href={`/invoice/${invoice.id}`} className="block">
+                #{invoice.invoiceNumber}
+              </Link>
+            </TableCell>
             <TableCell>
               <Link href={`/invoice/${invoice.id}`} className="block">
                 {new Date(invoice.createdAt).toLocaleDateString()}
@@ -66,10 +72,9 @@ export default async function Invoices({ userId }: InvoicesProps) {
                       'border-blue-100 text-blue-500',
                     invoice.status === 'PAID' &&
                       'border-green-100 text-green-500',
-                    invoice.status === 'VOID' &&
+                    invoice.status === 'UNPAID' &&
                       'border-gray-100 text-gray-500',
-                    invoice.status === 'UNCOLLECTIBLE' &&
-                      'border-red-100 text-red-500'
+                    invoice.status === 'REJECT' && 'border-red-100 text-red-500'
                   )}
                 >
                   {invoice.status}

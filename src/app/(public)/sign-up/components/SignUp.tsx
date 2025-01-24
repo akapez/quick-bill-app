@@ -5,7 +5,10 @@ import Link from 'next/link';
 
 import { register } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SignUpSchema, signUpSchema } from '@lib/zod-schema/sign-up';
+import {
+  RegisterSchema,
+  registerSchema,
+} from '@lib/zod-schema/register.schema';
 import { Loader2 } from 'lucide-react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -33,8 +36,8 @@ import { Separator } from '@components/ui/Separator';
 
 export default function SignUp() {
   const [isPending, startTransition] = useTransition();
-  const form = useForm<SignUpSchema>({
-    resolver: zodResolver(signUpSchema),
+  const form = useForm<RegisterSchema>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       name: '',
       email: '',
@@ -44,7 +47,7 @@ export default function SignUp() {
 
   const { handleSubmit, control, reset } = form;
 
-  const onSubmit: SubmitHandler<SignUpSchema> = async (data) => {
+  const onSubmit: SubmitHandler<RegisterSchema> = async (data) => {
     startTransition(() => {
       register(data).then((data) => {
         if (data.success) {

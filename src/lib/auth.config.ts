@@ -4,7 +4,7 @@ import type { NextAuthConfig } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import Google from 'next-auth/providers/google';
 
-import { signInSchema } from './zod-schema/sign-in';
+import { loginSchema } from './zod-schema/login.schema';
 
 export default {
   providers: [
@@ -15,7 +15,7 @@ export default {
     }),
     Credentials({
       async authorize(credentials) {
-        const validateFields = signInSchema.safeParse(credentials);
+        const validateFields = loginSchema.safeParse(credentials);
         if (validateFields.success) {
           const { email, password } = validateFields.data;
           const user = await getUserByEmail(email);

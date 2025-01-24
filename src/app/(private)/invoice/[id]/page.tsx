@@ -33,7 +33,11 @@ export default async function InvoicePage({
         <h1 className="my-4 text-left text-3xl font-bold">Invoice Details</h1>
         <div className="flex flex-row space-x-2">
           {invoice.sender.id === session?.user.id && (
-            <InvoiceStatus id={invoice.id} currentStatus={invoice.status} />
+            <InvoiceStatus
+              id={invoice.id}
+              currentStatus={invoice.status}
+              userId={session?.user.id}
+            />
           )}
           <Menu
             id={invoice.id}
