@@ -1,9 +1,9 @@
 'use client';
 
-import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
 
 import { Button } from '../../ui/Button';
+import { MoonIcon, SunIcon } from './icons';
 
 export default function ToggleTheme() {
   const { setTheme, theme } = useTheme();
@@ -14,10 +14,8 @@ export default function ToggleTheme() {
   };
 
   return (
-    <div>
-      <Button variant="outline" size="icon" onClick={handleTheme}>
-        {theme === 'light' ? <Sun /> : <Moon />}
-      </Button>
-    </div>
+    <Button variant="outline" size="icon" onClick={handleTheme}>
+      {theme === 'light' ? <SunIcon /> : <MoonIcon />}
+    </Button>
   );
 }

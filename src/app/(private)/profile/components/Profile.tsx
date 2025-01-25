@@ -1,11 +1,13 @@
 'use client';
 
 import { useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 
-import { createInvoice } from '@actions/invoice';
+import { updateProfile } from '@actions/user';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { InvoiceSchema, invoiceSchema } from '@lib/zod-schema/invoice.schema';
+import { ProfileSchema, profileSchema } from '@lib/zod-schema/profile.schema';
 import { Loader2 } from 'lucide-react';
+import { useSession } from 'next-auth/react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
@@ -19,31 +21,37 @@ import {
   FormMessage,
 } from '@components/ui/Form';
 import { Input } from '@components/ui/Input';
-import { Textarea } from '@components/ui/TextArea';
 
-interface NewInvoiceProps {
+interface ProfileProps {
   userId: string;
 }
 
-export default function NewInvoice({ userId }: NewInvoiceProps) {
+export default function Profile({ userId }: ProfileProps) {
+  const router = useRouter();
+  const { update } = useSession();
   const [isPending, startTransition] = useTransition();
-  const form = useForm<InvoiceSchema>({
-    resolver: zodResolver(invoiceSchema),
+  const form = useForm<ProfileSchema>({
+    resolver: zodResolver(profileSchema),
     defaultValues: {
-      email: '',
-      amount: 0,
-      description: '',
+      name: '',
+      image: undefined,
     },
   });
 
-  const { handleSubmit, control, reset } = form;
+  const { handleSubmit, control } = form;
 
-  const onSubmit: SubmitHandler<InvoiceSchema> = async (data) => {
+  const onSubmit: SubmitHandler<ProfileSchema> = async (data) => {
+    const formData = new FormData();
+    formData.append('name', data.name);
+    if (data.image) {
+      formData.append('image', data.image);
+    }
     startTransition(() => {
-      createInvoice(data, userId).then((data) => {
+      updateProfile(formData, userId).then((data) => {
         if (data.success) {
-          toast.success(data.success);
-          reset();
+          toast.success('Profile updated!');
+          update({ name: data.success.name, image: data.success.image });
+          router.push('/dashboard');
         } else {
           toast.error(data.error);
         }
@@ -58,15 +66,15 @@ export default function NewInvoice({ userId }: NewInvoiceProps) {
           <div className="space-y-2">
             <FormField
               control={control}
-              name="email"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="email">Billing Email</FormLabel>
+                  <FormLabel htmlFor="name">Name</FormLabel>
                   <FormControl>
                     <Input
-                      id="email"
-                      type="email"
-                      placeholder="sam.smith@example.com"
+                      id="name"
+                      type="text"
+                      placeholder="Name"
                       {...field}
                     />
                   </FormControl>
@@ -76,34 +84,20 @@ export default function NewInvoice({ userId }: NewInvoiceProps) {
             />
             <FormField
               control={control}
-              name="description"
+              name="image"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel htmlFor="description">Description</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      id="description"
-                      placeholder="Description"
-                      className="resize-none"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel htmlFor="amount">Amount</FormLabel>
+                  <FormLabel htmlFor="image">Upload Image</FormLabel>
                   <FormControl>
                     <Input
-                      id="amount"
-                      type="number"
-                      placeholder="Amount"
-                      {...field}
+                      id="image"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files) {
+                          field.onChange(e.target.files[0]);
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -113,7 +107,7 @@ export default function NewInvoice({ userId }: NewInvoiceProps) {
           </div>
           <Button
             disabled={isPending}
-            id="create-invoice-btn"
+            id="update-profile-btn"
             className="w-full md:w-40"
             type="submit"
           >
@@ -123,7 +117,7 @@ export default function NewInvoice({ userId }: NewInvoiceProps) {
                 Please wait
               </>
             ) : (
-              'Create'
+              'Update'
             )}
           </Button>
         </form>

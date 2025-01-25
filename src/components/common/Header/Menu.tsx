@@ -45,7 +45,7 @@ export default function Menu({ children, name }: MenuProps) {
           onClick={() =>
             signOut({
               redirect: true,
-              callbackUrl: '/sign-in',
+              callbackUrl: '/',
             })
           }
         >

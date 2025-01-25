@@ -2,9 +2,9 @@
 
 import { formatCurrency } from '@lib/utils';
 import {
-  ArrowUpDown,
   HandCoins,
   MoveDown,
+  MoveUp,
   PiggyBank,
   TrendingDown,
   TrendingUp,
@@ -35,7 +35,7 @@ export default function Widgets({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(revenue)}</div>
-          <div className="mt-8 flex items-center text-sm text-green-600">
+          <div className="mt-7 flex items-center text-sm text-green-600">
             <TrendingUp className="mr-1 h-4 w-4" />
             <span>Total Revenue for {year}</span>
           </div>
@@ -48,7 +48,7 @@ export default function Widgets({
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{formatCurrency(expenses)}</div>
-          <div className="mt-8 flex items-center text-sm text-red-600">
+          <div className="mt-7 flex items-center text-sm text-red-600">
             <TrendingDown className="mr-1 h-4 w-4" />
             <span>Total Expenses for {year}</span>
           </div>
@@ -57,10 +57,10 @@ export default function Widgets({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Open Invoices</CardTitle>
-          <ArrowUpDown className="h-8 w-8 text-muted-foreground" />
+          <MoveUp className="h-8 w-8 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-5xl font-bold">{invoiceCount.open}</div>
+          <div className="text-4xl font-bold">{invoiceCount.open}</div>
           <div className="mt-4 flex items-center">
             <Badge variant="outline" className="border-blue-100 text-blue-500">
               OPEN

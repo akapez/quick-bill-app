@@ -268,10 +268,8 @@ export const getInvoiceCounts = async (userId: string) => {
   try {
     const openInvoiceCount = await prisma.invoice.count({
       where: {
-        OR: [
-          { senderId: userId, status: 'OPEN' },
-          { receiverId: userId, status: 'OPEN' },
-        ],
+        senderId: userId,
+        status: 'OPEN',
       },
     });
 

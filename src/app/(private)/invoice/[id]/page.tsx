@@ -8,7 +8,7 @@ import BackButton from '@components/common/BackButton';
 
 import Invoice from './components/Invoice';
 import InvoiceStatus from './components/InvoiceStatus';
-import Menu from './components/Menu';
+import PaymentButton from './components/PaymentButton';
 
 export const metadata: Metadata = {
   title: 'Invoice Details',
@@ -39,11 +39,7 @@ export default async function InvoicePage({
               userId={session?.user.id}
             />
           )}
-          <Menu
-            id={invoice.id}
-            senderId={invoice.sender.id}
-            userId={session?.user.id}
-          />
+          <PaymentButton id={invoice.id} />
         </div>
       </div>
       <Invoice invoice={invoice} />

@@ -1,6 +1,7 @@
 'use server';
 
 import { signIn } from '@lib/auth';
+import { cloudinary } from '@lib/cloudinary';
 import { prisma } from '@lib/prisma';
 import { DEFAULT_REDIRECT } from '@lib/routes';
 import {
@@ -13,6 +14,7 @@ import {
   PasswordSchema,
   passwordSchema,
 } from '@lib/zod-schema/password.schema';
+import { profileSchema } from '@lib/zod-schema/profile.schema';
 import {
   RegisterSchema,
   registerSchema,
@@ -23,6 +25,7 @@ import { AuthError } from 'next-auth';
 import {
   getPasswordResetTokenByToken,
   getUserByEmail,
+  getUserById,
   getVerifyTokenByToken,
 } from './data';
 import { sendPasswordResetEmail, sendVerificationEmail } from './mail';
@@ -184,4 +187,57 @@ export const reset = async (values: EmailSchema) => {
     token.token
   );
   return { success: 'Password reset email sent!' };
+};
+
+//update profile details
+export const updateProfile = async (form: FormData, userId: string) => {
+  const formData = Object.fromEntries(form);
+  const validatedFields = profileSchema.safeParse(formData);
+  if (!validatedFields.success) {
+    return { error: 'Invalid fields!' };
+  }
+  const user = await getUserById(userId);
+  if (!user) {
+    return { error: 'User not found!' };
+  }
+  try {
+    const newName = form.get('name') as string;
+    const file = form.get('image') as File;
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    let imageUrl: string | undefined = undefined;
+
+    if (file) {
+      imageUrl = await new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+          { resource_type: 'image', folder: 'quick-bill-profiles' },
+          (error, result) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(result?.secure_url);
+            }
+          }
+        );
+
+        uploadStream.end(buffer);
+      });
+    }
+    const updateUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name: newName,
+        image: imageUrl,
+      },
+      select: {
+        id: true,
+        name: true,
+        image: true,
+      },
+    });
+    return { success: updateUser };
+  } catch {
+    return { error: 'Something went wrong!' };
+  }
 };

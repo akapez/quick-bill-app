@@ -31,17 +31,29 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       if (token.sub && session.user) {
         session.user.id = token.sub;
       }
+      if (token.name && session.user) {
+        session.user.name = token.name;
+      }
+      if (token.image && session.user) {
+        session.user.image = token.picture;
+      }
       if (token.role && session.user) {
         session.user.role = token.role as UserRole;
       }
       return session;
     },
-    async jwt({ token }) {
+    async jwt({ token, trigger }) {
       if (!token.sub) return token;
       const id = token.sub;
-      const existingUser = await getUserById(id);
+      let existingUser;
+      if (trigger === 'update') {
+        existingUser = await getUserById(id);
+      }
+      existingUser = await getUserById(id);
       if (!existingUser) return token;
       token.role = existingUser.role;
+      token.name = existingUser.name;
+      token.picture = existingUser.image;
       return token;
     },
   },

@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 import { auth } from '@lib/auth';
 
-import { Button } from '@components/ui/Button';
+import StartButton from '@components/common/StartButton';
 
 export default async function Home() {
   const session = await auth();
@@ -20,24 +20,13 @@ export default async function Home() {
               finances.
             </p>
           </div>
-          <div className="space-x-4">
-            <Button
-              asChild
-              className="bg-[#1c1917] text-white hover:bg-[#3D3D3D] hover:text-white"
-            >
-              {session?.user.id ? (
-                <Link href="/dashboard">Dashboard</Link>
-              ) : (
-                <Link href="/sign-in">Get Started</Link>
-              )}
-            </Button>
-            <Button
-              variant="outline"
-              className="border-[#E5E1DA] bg-[#FBFBFB] text-black hover:bg-[#FDF7F4] hover:text-black"
-            >
-              Learn More
-            </Button>
-          </div>
+          <StartButton>
+            {session?.user.id ? (
+              <Link href="/dashboard">Dashboard</Link>
+            ) : (
+              <Link href="/sign-in">Get Started</Link>
+            )}
+          </StartButton>
         </div>
       </div>
     </section>

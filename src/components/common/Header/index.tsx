@@ -3,8 +3,8 @@ import Link from 'next/link';
 import { Button } from '@components/ui/Button';
 
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/Avatar';
-import ToggleTheme from '../ToggleTheme';
 import Menu from './Menu';
+import ToggleTheme from './ToggleTheme';
 
 export interface HeaderProps {
   id: string | null;
@@ -20,7 +20,10 @@ export default function Header({ id, imageUrl, name }: HeaderProps) {
         <span className="font-bold sm:inline-block">QuickBill</span>
       </Link>
       <div className="flex flex-1 items-center justify-end space-x-2">
-        <ToggleTheme />
+        <div>
+          <ToggleTheme />
+        </div>
+
         {!id ? (
           <Link href="/sign-in">
             <Button size="sm">Sign In</Button>
