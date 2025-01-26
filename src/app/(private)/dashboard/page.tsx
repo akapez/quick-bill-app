@@ -40,7 +40,6 @@ export default async function DashboardPage() {
         income={income.totalAmount}
         expenses={expenses.totalAmount}
         invoiceCount={invoiceCount}
-        name={session?.user.name || '@user'}
       />
       <Separator className="mt-5" />
       <div className="mt-5 flex items-center justify-between">
