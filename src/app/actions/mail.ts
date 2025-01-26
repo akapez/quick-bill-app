@@ -7,6 +7,7 @@ import PasswordEmail from '@components/common/Emails/Password';
 import VerificationEmail from '@components/common/Emails/Verification';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const mail = process.env.MAIL;
 
 export const sendVerificationEmail = async (
   name: string,
@@ -14,7 +15,7 @@ export const sendVerificationEmail = async (
   token: string
 ) => {
   await resend.emails.send({
-    from: 'QuickBill <onboarding@resend.dev>',
+    from: `QuickBill <${mail}>`,
     to: email,
     subject: 'Verify your email address',
     react: VerificationEmail({ name, token }),
@@ -27,7 +28,7 @@ export const sendPasswordResetEmail = async (
   token: string
 ) => {
   await resend.emails.send({
-    from: 'QuickBill <onboarding@resend.dev>',
+    from: `QuickBill <${mail}>`,
     to: email,
     subject: 'Reset your password',
     react: PasswordEmail({ name, token }),
@@ -41,7 +42,7 @@ export const sendInvoiceEmail = async (
   email: string
 ) => {
   await resend.emails.send({
-    from: 'QuickBill <onboarding@resend.dev>',
+    from: `QuickBill <${mail}>`,
     to: email,
     subject: `You have an Invoice ${invoiceNumber}`,
     react: InvoiceEmail({ invoiceId, invoiceNumber, billingName }),

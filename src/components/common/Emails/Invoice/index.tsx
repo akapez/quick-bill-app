@@ -52,9 +52,7 @@ export const InvoiceEmail = ({
           </Button>
           <Hr style={hr} />
           <Hr style={hr} />
-          <Text style={footer}>
-            © 2025 QuickBill Inc. All rights reserved.
-          </Text>
+          <Text style={footer}>QuickBill © 2025</Text>
         </Section>
       </Container>
     </Body>

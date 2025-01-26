@@ -56,7 +56,7 @@ export const PasswordEmail = ({ name, token }: PasswordEmailProps) => (
           The QuickBill team
         </Text>
         <Hr style={hr} />
-        <Text style={footer}>© 2025 QuickBill Inc. All rights reserved.</Text>
+        <Text style={footer}>QuickBill © 2025</Text>
       </Container>
     </Body>
   </Html>
