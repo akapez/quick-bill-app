@@ -32,6 +32,7 @@ export default function NewInvoice({ userId }: NewInvoiceProps) {
     defaultValues: {
       email: '',
       amount: 0,
+      type: '',
       description: '',
     },
   });
@@ -67,6 +68,24 @@ export default function NewInvoice({ userId }: NewInvoiceProps) {
                       id="email"
                       type="email"
                       placeholder="sam.smith@example.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name="type"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel htmlFor="type">Invoice Type</FormLabel>
+                  <FormControl>
+                    <Input
+                      id="type"
+                      type="type"
+                      placeholder="Product Sales"
                       {...field}
                     />
                   </FormControl>

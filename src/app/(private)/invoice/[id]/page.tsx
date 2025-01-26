@@ -29,8 +29,8 @@ export default async function InvoicePage({
   return (
     <div className="mx-3 my-8 flex flex-col justify-center md:px-6 xl:px-36">
       <BackButton href="/dashboard" />
-      <div className="flex max-w-6xl items-center justify-between">
-        <h1 className="my-4 text-left text-3xl font-bold">Invoice Details</h1>
+      <div className="my-4 flex max-w-6xl items-center justify-between">
+        <h1 className="text-left text-3xl font-bold">Invoice Details</h1>
         <div className="flex flex-row space-x-2">
           {invoice.sender.id === session?.user.id && (
             <InvoiceStatus

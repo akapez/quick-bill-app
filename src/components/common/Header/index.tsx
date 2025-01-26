@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Button } from '@components/ui/Button';
 
 import { Avatar, AvatarFallback, AvatarImage } from '../../ui/Avatar';
+import ClientOnly from '../ClientOnly';
 import Menu from './Menu';
 import ToggleTheme from './ToggleTheme';
 
@@ -20,10 +21,9 @@ export default function Header({ id, imageUrl, name }: HeaderProps) {
         <span className="font-bold sm:inline-block">QuickBill</span>
       </Link>
       <div className="flex flex-1 items-center justify-end space-x-2">
-        <div>
+        <ClientOnly>
           <ToggleTheme />
-        </div>
-
+        </ClientOnly>
         {!id ? (
           <Link href="/sign-in">
             <Button size="sm">Sign In</Button>

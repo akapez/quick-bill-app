@@ -12,6 +12,15 @@ export const invoiceSchema = z.object({
     .refine((n) => /^\d+(\.\d{1,2})?$/.test(n.toString()), {
       message: 'Amount must have up to 2 decimal points',
     }),
+  type: z
+    .string()
+    .trim()
+    .min(5, {
+      message: 'Type must be at least 5 characters.',
+    })
+    .max(50, {
+      message: 'Type must be no longer than 50 characters.',
+    }),
   description: z
     .string()
     .trim()

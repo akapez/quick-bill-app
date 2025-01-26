@@ -16,8 +16,8 @@ export default async function Home() {
               Simplify Your Invoicing Process
             </h2>
             <p className="mx-auto max-w-[700px] text-gray-500 dark:text-gray-400 md:text-lg">
-              Streamline your billing, get paid faster, and manage your
-              finances.
+              Streamline billing for your small business, get paid faster, and
+              improve your financial management.
             </p>
           </div>
           <StartButton>

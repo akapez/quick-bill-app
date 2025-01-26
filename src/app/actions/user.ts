@@ -203,12 +203,12 @@ export const updateProfile = async (form: FormData, userId: string) => {
   try {
     const newName = form.get('name') as string;
     const file = form.get('image') as File;
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
 
     let imageUrl: string | undefined = undefined;
 
     if (file) {
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
       imageUrl = await new Promise((resolve, reject) => {
         const uploadStream = cloudinary.uploader.upload_stream(
           { resource_type: 'image', folder: 'quick-bill-profiles' },
@@ -228,7 +228,7 @@ export const updateProfile = async (form: FormData, userId: string) => {
       where: { id: userId },
       data: {
         name: newName,
-        image: imageUrl,
+        image: imageUrl && imageUrl,
       },
       select: {
         id: true,

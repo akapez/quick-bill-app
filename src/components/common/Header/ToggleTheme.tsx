@@ -3,7 +3,8 @@
 import { useTheme } from 'next-themes';
 
 import { Button } from '../../ui/Button';
-import { MoonIcon, SunIcon } from './icons';
+import { MoonIcon } from './icons/moon.icon';
+import { SunIcon } from './icons/sun.icon';
 
 export default function ToggleTheme() {
   const { setTheme, theme } = useTheme();

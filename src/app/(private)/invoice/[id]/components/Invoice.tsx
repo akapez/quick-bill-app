@@ -72,6 +72,10 @@ export default function InvoiceDetails({ invoice }: { invoice: Invoice }) {
           </div>
         </div>
         <div className="mt-6">
+          <h3 className="mb-2 text-lg font-semibold">Invoice Type:</h3>
+          <p>{invoice.type}</p>
+        </div>
+        <div className="mt-6">
           <h3 className="mb-2 text-lg font-semibold">Description:</h3>
           <p>{invoice.description}</p>
         </div>

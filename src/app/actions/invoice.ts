@@ -4,14 +4,13 @@ import { revalidatePath } from 'next/cache';
 
 import { Status } from '@definitions/invoice';
 import { prisma } from '@lib/prisma';
-import { getYearStartAndEndDates } from '@lib/utils';
+import { getMonthStartAndEndDates } from '@lib/utils';
 import { invoiceSchema, InvoiceSchema } from '@lib/zod-schema/invoice.schema';
 
 import { getInvoiceBySenderId, getUserByEmail, getUserById } from './data';
 import { sendInvoiceEmail } from './mail';
 
-const currentYear = new Date().getFullYear();
-const { startDate, endDate } = getYearStartAndEndDates(currentYear);
+const { startDate, endDate } = getMonthStartAndEndDates();
 
 // create a new invoice
 export const createInvoice = async (values: InvoiceSchema, userId: string) => {
@@ -19,7 +18,7 @@ export const createInvoice = async (values: InvoiceSchema, userId: string) => {
   if (!validatedFields.success) {
     return { error: 'Invalid fields!' };
   }
-  const { email, description, amount } = validatedFields.data;
+  const { email, type, description, amount } = validatedFields.data;
   try {
     if (!userId) {
       return { error: 'Unauthorized!' };
@@ -32,24 +31,15 @@ export const createInvoice = async (values: InvoiceSchema, userId: string) => {
     if (!receiver) {
       return { error: 'User does not exist!' };
     }
-    const lastInvoice = await prisma.invoice.findFirst({
-      orderBy: { invoiceNumber: 'desc' },
-    });
-
-    let newIdNumber = 1;
-    if (lastInvoice && lastInvoice.invoiceNumber) {
-      const match = lastInvoice.invoiceNumber.match(/INV(\d+)/);
-      if (match) {
-        newIdNumber = parseInt(match[1], 10) + 1;
-      }
-    }
-    const invoiceNumber = `INV${newIdNumber.toString().padStart(3, '0')}`;
+    const randomNumber = Math.floor(Math.random() * (999 - 100 + 1) + 100);
+    const invoiceNumber = `INV${randomNumber}`;
 
     const result = await prisma.invoice.create({
       data: {
         senderId: userId,
         receiverId: receiver.id,
         invoiceNumber,
+        type,
         description,
         amount,
       },
@@ -210,53 +200,89 @@ export const updatePaymentStatus = async (id: string, status: Status) => {
 };
 
 //get statics
-export const getTotalRevenue = async (userId: string) => {
+export const getTotalIncome = async (userId: string) => {
   if (!userId) {
-    return 0;
+    return { totalAmount: 0, invoices: [] };
   }
   try {
-    const totalRevenue = await prisma.invoice.aggregate({
-      _sum: {
-        amount: true,
-      },
+    const invoices = await prisma.invoice.findMany({
       where: {
         senderId: userId,
         status: 'PAID',
-        createdAt: {
+        updatedAt: {
           gte: startDate,
           lte: endDate,
         },
       },
+      select: {
+        id: true,
+        invoiceNumber: true,
+        description: true,
+        amount: true,
+      },
     });
 
-    return totalRevenue._sum.amount || 0;
+    const totalAmount = invoices.reduce(
+      (sum, invoice) => sum + invoice.amount,
+      0
+    );
+
+    return {
+      totalAmount,
+      invoices,
+    };
   } catch {
-    return 0;
+    return { totalAmount: 0, invoices: [] };
   }
 };
 
 export const getTotalExpenses = async (userId: string) => {
   if (!userId) {
-    return 0;
+    return { totalAmount: 0, invoices: [] };
   }
   try {
-    const totalRevenue = await prisma.invoice.aggregate({
-      _sum: {
-        amount: true,
-      },
+    // const totalIncome = await prisma.invoice.aggregate({
+    //   _sum: {
+    //     amount: true,
+    //   },
+    //   where: {
+    //     receiverId: userId,
+    //     status: 'PAID',
+    //     updatedAt: {
+    //       gte: startDate,
+    //       lte: endDate,
+    //     },
+    //   },
+    // });
+    // return totalIncome._sum.amount || 0;
+    const invoices = await prisma.invoice.findMany({
       where: {
         receiverId: userId,
         status: 'PAID',
-        createdAt: {
+        updatedAt: {
           gte: startDate,
           lte: endDate,
         },
       },
+      select: {
+        id: true,
+        invoiceNumber: true,
+        description: true,
+        amount: true,
+      },
     });
 
-    return totalRevenue._sum.amount || 0;
+    const totalAmount = invoices.reduce(
+      (sum, invoice) => sum + invoice.amount,
+      0
+    );
+
+    return {
+      totalAmount,
+      invoices,
+    };
   } catch {
-    return 0;
+    return { totalAmount: 0, invoices: [] };
   }
 };
 
@@ -275,8 +301,12 @@ export const getInvoiceCounts = async (userId: string) => {
 
     const paidInvoiceCount = await prisma.invoice.count({
       where: {
-        receiverId: userId,
+        senderId: userId,
         status: 'PAID',
+        updatedAt: {
+          gte: startDate,
+          lte: endDate,
+        },
       },
     });
 

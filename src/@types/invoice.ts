@@ -14,9 +14,17 @@ export type Invoice = {
   invoiceNumber: string;
   status: Status;
   amount: number;
+  type: string;
   description: string;
   createdAt: Date;
   updatedAt: Date;
   sender: User;
   receiver: User;
+};
+
+export type Info = {
+  id: string;
+  invoiceNumber: string;
+  description: string;
+  amount: number;
 };

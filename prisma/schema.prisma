@@ -82,6 +82,7 @@ model Invoice {
   invoiceNumber String
   senderId String @db.ObjectId
   receiverId String @db.ObjectId
+  type String
   description String
   amount Float
   status Status @default(OPEN)

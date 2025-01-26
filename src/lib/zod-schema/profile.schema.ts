@@ -6,7 +6,7 @@ export const profileSchema = z.object({
   }),
   image: z
     .instanceof(File)
-    .refine((file) => file.size <= 5000000, 'Max file size is 5MB')
+    .refine((file) => file.size <= 1000000, 'Max file size is 1MB')
     .optional(),
 });
 
