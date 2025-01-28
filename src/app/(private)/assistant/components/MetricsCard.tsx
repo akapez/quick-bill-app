@@ -13,13 +13,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/Card';
 interface MetricsCardProps {
   income: number;
   expenses: number;
-  invoiceCount: { open: number; paid: number };
+  openCount: number;
+  paidCount: number;
 }
 
 export default function MetricsCard({
   income,
   expenses,
-  invoiceCount,
+  openCount,
+  paidCount,
 }: MetricsCardProps) {
   const now = new Date();
   // date range of month
@@ -28,7 +30,7 @@ export default function MetricsCard({
   const start_month = format(start, 'MMM dd');
   const end_month = format(end, 'MMM dd, yyyy');
   return (
-    <Card className="w-full">
+    <Card className="mb-5 w-full">
       <CardHeader className="flex-cols flex md:flex-row md:items-center md:justify-between">
         <CardTitle className="text-lg font-semibold">Metrics</CardTitle>
         <div className="flex items-center space-x-1 text-sm text-muted-foreground">
@@ -70,7 +72,7 @@ export default function MetricsCard({
               <p className="text-sm font-medium text-muted-foreground">
                 Open Invoices
               </p>
-              <h3 className="text-2xl font-bold">{invoiceCount.open}</h3>
+              <h3 className="text-2xl font-bold">{openCount}</h3>
             </div>
           </div>
           <div className="flex items-center space-x-4 rounded-lg border p-4">
@@ -81,7 +83,7 @@ export default function MetricsCard({
               <p className="text-sm font-medium text-muted-foreground">
                 Paid Invoices
               </p>
-              <h3 className="text-2xl font-bold">{invoiceCount.paid}</h3>
+              <h3 className="text-2xl font-bold">{paidCount}</h3>
             </div>
           </div>
         </div>

@@ -26,8 +26,12 @@ export function getMonthStartAndEndDates() {
 export function generateFinancialReportPrompt(
   income: { totalAmount: number; invoices: Info[] },
   expenses: { totalAmount: number; invoices: Info[] },
-  openInvoices: number,
-  paidInvoices: number,
+  openAndPaidInvoices: {
+    open: number;
+    paid: number;
+    openInvoices: Info[];
+    paidInvoices: Info[];
+  },
   startDate: string,
   endDate: string
 ) {
@@ -47,23 +51,31 @@ export function generateFinancialReportPrompt(
     )
     .join('; ');
 
+  //open invoices details
+  const openInvoices = openAndPaidInvoices.openInvoices.map(
+    (invoice) =>
+      `Invoice Number: ${invoice.invoiceNumber}, Description: ${invoice.description}, Amount: $${invoice.amount}, Created Date: ${invoice.createdAt}`
+  );
+
   // final prompt
   const prompt = `
       Generate financial insights based on these metrics:
       Total Income: $${income.totalAmount},
       Total Expenses: $${expenses.totalAmount},
-      Open Invoices: ${openInvoices},
-      Paid Invoices: ${paidInvoices}.
+      Open Invoices: ${openAndPaidInvoices.open},
+      Paid Invoices: ${openAndPaidInvoices.paid}.
 
       Period: ${startDate} - ${endDate}
       
       Based on these additional data:
       
       Income Total Amount: $${income.totalAmount}
-      Income Invoices: [${incomeInvoices}]
+      Income Invoices Details: [${incomeInvoices}]
       
       Expenses Total Amount: $${expenses.totalAmount}
-      Expense Invoices: [${expenseInvoices}]
+      Expense Invoices Details: [${expenseInvoices}]
+
+      Open Invoices Details: [${openInvoices}]
   `;
 
   return prompt.trim();
