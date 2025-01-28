@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   const { messages } = await request.json();
 
   const result = streamText({
-    model: openai('gpt-4'),
+    model: openai('gpt-4o'),
     system: `\n
     - you help users manage financial data and make informed decisions.
     - keep your responses limited to a sentence.

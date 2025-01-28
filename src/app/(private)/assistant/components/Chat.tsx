@@ -1,6 +1,7 @@
 'use client';
 
 import { useChat } from 'ai/react';
+import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { Send } from 'lucide-react';
 import Markdown from 'react-markdown';
@@ -23,8 +24,24 @@ import InvoiceList from './InvoicesList';
 import MetricsCard from './MetricsCard';
 import MetricsSkeleton from './MetricsSkeleton';
 
+const month = format(new Date(), 'MMMM');
+
+const suggestedActions = [
+  {
+    title: 'Summary',
+    label: `monthly finance summery - ${month}`,
+    action: 'Display the finance summary of the month',
+  },
+  {
+    title: 'Unpaid invoices',
+    label: 'list of open invoices',
+    action: 'Show me the open invoices that are currently available',
+  },
+];
+
 export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat();
+  const { messages, input, handleInputChange, handleSubmit, append } =
+    useChat();
 
   return (
     <Card className="mt-4 w-full">
@@ -34,6 +51,33 @@ export default function Chat() {
       <Separator />
       <CardContent className="mt-5 flex justify-start">
         <ScrollArea className="flex h-[70vh] w-full">
+          <div className="mx-auto mb-4 grid w-full gap-2 px-4 sm:grid-cols-2 md:max-w-[500px] md:px-0">
+            {messages.length === 0 &&
+              suggestedActions.map((action, index) => (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.05 * index }}
+                  key={index}
+                  className={index > 1 ? 'hidden sm:block' : 'block'}
+                >
+                  <button
+                    onClick={async () => {
+                      append({
+                        role: 'user',
+                        content: action.action,
+                      });
+                    }}
+                    className="flex w-full flex-col rounded-lg border border-zinc-200 p-2 text-left text-sm text-zinc-800 transition-colors hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-800"
+                  >
+                    <span className="font-medium">{action.title}</span>
+                    <span className="text-zinc-500 dark:text-zinc-400">
+                      {action.label}
+                    </span>
+                  </button>
+                </motion.div>
+              ))}
+          </div>
           {messages.map((message) => (
             <div key={message.id}>
               <motion.div

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import sketch from '@assets/mall-sketch.png';
 import { auth } from '@lib/auth';
 
+import BrandText from '@components/common/BrandText';
 import GlowingButton from '@components/common/GlowingButton';
 
 export default async function Home() {
@@ -21,8 +22,8 @@ export default async function Home() {
       <div className="absolute inset-0" aria-hidden="true" />
       <div className="z-50 px-4 md:px-6">
         <div className="flex flex-col items-center space-y-4 text-center">
-          <div className="space-y-2">
-            <h1 className="text-xl font-bold text-[#B771E5]">QuickBill</h1>
+          <div className="mb-6 space-y-2">
+            <BrandText />
             <h2 className="text-3xl font-bold tracking-tighter text-black sm:text-4xl md:text-5xl lg:text-6xl/none">
               Simplify Your Invoicing Process
             </h2>
