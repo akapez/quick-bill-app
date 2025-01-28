@@ -1,9 +1,10 @@
 'use server';
 
-import { Resend } from 'resend';
+import { CreateEmailResponse, Resend } from 'resend';
 
 import InvoiceEmail from '@components/common/Emails/Invoice';
 import PasswordEmail from '@components/common/Emails/Password';
+import ReminderEmail from '@components/common/Emails/Reminder';
 import VerificationEmail from '@components/common/Emails/Verification';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -44,7 +45,23 @@ export const sendInvoiceEmail = async (
   await resend.emails.send({
     from: `QuickBill <${mail}>`,
     to: email,
-    subject: `You have an Invoice ${invoiceNumber}`,
+    subject: `You have an Invoice Reminder ${invoiceNumber}`,
     react: InvoiceEmail({ invoiceId, invoiceNumber, billingName }),
   });
+};
+
+export const sendReminderEmail = async (
+  invoiceId: string,
+  invoiceNumber: string,
+  billingName: string,
+  email: string
+) => {
+  const data: CreateEmailResponse = await resend.emails.send({
+    from: `QuickBill <${mail}>`,
+    to: email,
+    subject: `Friendly Reminder: Invoice Payment Due ${invoiceNumber}`,
+    react: ReminderEmail({ invoiceId, invoiceNumber, billingName }),
+  });
+
+  return data;
 };

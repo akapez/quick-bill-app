@@ -286,20 +286,63 @@ export const getTotalExpenses = async (userId: string) => {
   }
 };
 
-export const getInvoiceCounts = async (userId: string) => {
-  if (!userId) {
-    return { open: 0, paid: 0 };
-  }
+// export const getInvoiceCounts = async (userId: string) => {
+//   if (!userId) {
+//     return { open: 0, paid: 0 };
+//   }
 
+//   try {
+//     const openInvoiceCount = await prisma.invoice.count({
+//       where: {
+//         senderId: userId,
+//         status: 'OPEN',
+//       },
+//     });
+
+//     const paidInvoiceCount = await prisma.invoice.count({
+//       where: {
+//         senderId: userId,
+//         status: 'PAID',
+//         updatedAt: {
+//           gte: startDate,
+//           lte: endDate,
+//         },
+//       },
+//     });
+
+//     return { open: openInvoiceCount, paid: paidInvoiceCount };
+//   } catch {
+//     return { open: 0, paid: 0 };
+//   }
+// };
+
+export const getPaidAndOpenInvoices = async (userId: string) => {
+  if (!userId) {
+    return { open: 0, paid: 0, openInvoices: [], paidInvoices: [] };
+  }
   try {
-    const openInvoiceCount = await prisma.invoice.count({
+    const openInvoices = await prisma.invoice.findMany({
       where: {
         senderId: userId,
         status: 'OPEN',
       },
+      select: {
+        id: true,
+        description: true,
+        amount: true,
+        invoiceNumber: true,
+        createdAt: true,
+        receiver: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
     });
+    const openInvoiceCount = openInvoices.length;
 
-    const paidInvoiceCount = await prisma.invoice.count({
+    const paidInvoices = await prisma.invoice.findMany({
       where: {
         senderId: userId,
         status: 'PAID',
@@ -308,10 +351,28 @@ export const getInvoiceCounts = async (userId: string) => {
           lte: endDate,
         },
       },
+      select: {
+        id: true,
+        description: true,
+        amount: true,
+        invoiceNumber: true,
+        updatedAt: true,
+        receiver: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
     });
-
-    return { open: openInvoiceCount, paid: paidInvoiceCount };
+    const paidInvoiceCount = paidInvoices.length;
+    return {
+      open: openInvoiceCount,
+      paid: paidInvoiceCount,
+      openInvoices,
+      paidInvoices,
+    };
   } catch {
-    return { open: 0, paid: 0 };
+    return { open: 0, paid: 0, openInvoices: [], paidInvoices: [] };
   }
 };

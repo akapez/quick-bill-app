@@ -1,6 +1,7 @@
 'use client';
 
 import { Fragment, useState, useTransition } from 'react';
+import Link from 'next/link';
 
 import { generatedData } from '@actions/gemini';
 import { Info } from '@definitions/invoice';
@@ -13,20 +14,23 @@ import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/Card';
 import { ScrollArea } from '@components/ui/ScrollArea';
 import { Separator } from '@components/ui/Separator';
 
-import InfoData from './InfoData';
-import Message from './Message';
-import MetricsCard from './MetricsCard';
+import Message from './AlertInfo';
 
 interface AnalysisProps {
   income: { totalAmount: number; invoices: Info[] };
   expenses: { totalAmount: number; invoices: Info[] };
-  invoiceCount: { open: number; paid: number };
+  openAndPaidInvoices: {
+    open: number;
+    paid: number;
+    openInvoices: Info[];
+    paidInvoices: Info[];
+  };
 }
 
 export default function Analysis({
   income,
   expenses,
-  invoiceCount,
+  openAndPaidInvoices,
 }: AnalysisProps) {
   const now = new Date();
   const [isPending, startTransition] = useTransition();
@@ -41,61 +45,65 @@ export default function Analysis({
   const isEnoughData = income.totalAmount > 100 && expenses.totalAmount > 100;
 
   const onAnalyze = async () => {
-    startTransition(() => {
-      generatedData(
+    startTransition(async () => {
+      const report = await generatedData(
         income,
         expenses,
-        invoiceCount.open,
-        invoiceCount.paid,
+        openAndPaidInvoices,
         start_month,
         end_month
-      ).then((data) => {
-        if (data.success) {
-          setFeedback({ content: data.success });
-        } else {
-          toast.error(data.error);
-        }
-      });
+      );
+      if (report.success) {
+        setFeedback({ content: report.content });
+      } else {
+        toast.error('Error generating the report!');
+      }
     });
   };
 
+  const infoTitleFirst =
+    'Visualize and analyze detailed financial data, including income, expenses, and performance metrics.';
+
+  const infoTitleTwo = `Due to insufficient data for comprehensive financial insights,
+  let's proceed with invoicing. To ensure a valid invoice, please
+  confirm that your total income exceeds $100 and your total expenses
+  exceeds $100.`;
+
   return (
-    <Card className="mb-20 mt-4 w-full max-w-4xl">
+    <Card className="mt-4 w-full">
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Finance Analysis</CardTitle>
-        {isEnoughData && (
-          <Button onClick={onAnalyze} disabled={isPending} size="sm">
-            {isPending ? 'Analyzing...' : 'Analyze'}
-          </Button>
-        )}
       </CardHeader>
       <Separator />
       <CardContent className="mt-5 flex justify-start">
         <ScrollArea className="flex h-[70vh] w-full">
-          <MetricsCard
-            income={income.totalAmount}
-            expenses={expenses.totalAmount}
-            invoiceCount={invoiceCount}
-          />
-          {isEnoughData ? (
+          {feedback ? (
             <Fragment>
-              <InfoData
-                title="Income References"
-                metricsInfo={income.invoices}
-              />
-              <InfoData
-                title="Expense References"
-                metricsInfo={expenses.invoices}
-              />
               <div className="'bg-secondary mt-5 rounded-lg p-2 text-left text-secondary-foreground">
-                <Markdown>{feedback?.content}</Markdown>
+                <Markdown>{feedback.content}</Markdown>
               </div>
             </Fragment>
           ) : (
-            <Message />
+            <Message title={infoTitleFirst}>
+              <Button
+                onClick={onAnalyze}
+                disabled={isPending}
+                size="sm"
+                className="ml-5"
+              >
+                {isPending ? 'Analyzing...' : 'Analyze'}
+              </Button>
+            </Message>
+          )}
+          {!isEnoughData && (
+            <Message title={infoTitleTwo}>
+              <Button variant="outline" asChild className="ml-5">
+                <Link href="/invoice">Create Invoice</Link>
+              </Button>
+            </Message>
           )}
           {isPending && (
-            <div className="text-left">
+            <div className="mt-5 text-left">
               <span className="inline-block rounded-lg bg-muted p-2 text-muted-foreground">
                 Working on data...
               </span>

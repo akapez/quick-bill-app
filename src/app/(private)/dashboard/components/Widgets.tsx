@@ -20,13 +20,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/Card';
 interface WidgetsProps {
   income: number;
   expenses: number;
-  invoiceCount: { open: number; paid: number };
+  openCount: number;
+  paidCount: number;
 }
 
 export default function Widgets({
   income,
   expenses,
-  invoiceCount,
+  openCount,
+  paidCount,
 }: WidgetsProps) {
   const now = new Date();
   const incomeCount = useCounter(income);
@@ -85,7 +87,7 @@ export default function Widgets({
           </CardHeader>
           <CardContent>
             <div className="flex flex-row items-center text-2xl font-bold">
-              {invoiceCount.open}
+              {openCount}
               <Badge
                 variant="outline"
                 className="ml-3 border-blue-100 text-blue-500"
@@ -102,7 +104,7 @@ export default function Widgets({
           </CardHeader>
           <CardContent>
             <div className="flex flex-row items-center text-2xl font-bold">
-              {invoiceCount.paid}
+              {paidCount}
               <Badge
                 variant="outline"
                 className="ml-3 border-green-100 text-green-500"

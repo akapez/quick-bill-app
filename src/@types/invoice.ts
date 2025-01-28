@@ -27,4 +27,9 @@ export type Info = {
   invoiceNumber: string;
   description: string;
   amount: number;
+  createdAt?: Date;
+  receiver?: {
+    email: string | null;
+    name: string | null;
+  };
 };

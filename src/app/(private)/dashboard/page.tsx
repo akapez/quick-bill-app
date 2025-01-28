@@ -3,8 +3,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 
 import {
-  getInvoiceCounts,
   getInvoicesByUserId,
+  getPaidAndOpenInvoices,
   getTotalExpenses,
   getTotalIncome,
 } from '@actions/invoice';
@@ -12,6 +12,7 @@ import aiImage from '@assets/ai.png';
 import { auth } from '@lib/auth';
 import { CirclePlus } from 'lucide-react';
 
+import GlowingButton from '@components/common/GlowingButton';
 import { Button } from '@components/ui/Button';
 import { Separator } from '@components/ui/Separator';
 
@@ -25,11 +26,11 @@ export const metadata: Metadata = {
 export default async function DashboardPage() {
   const session = await auth();
   const userId = session?.user.id || '';
-  const [invoices, income, expenses, invoiceCount] = await Promise.all([
+  const [invoices, income, expenses, openAndPaidInvoices] = await Promise.all([
     getInvoicesByUserId(userId),
     getTotalIncome(userId),
     getTotalExpenses(userId),
-    getInvoiceCounts(userId),
+    getPaidAndOpenInvoices(userId),
   ]);
   return (
     <div className="mx-5 mb-20 mt-8 flex flex-col justify-center md:mb-40 md:px-6 xl:px-36">
@@ -39,7 +40,8 @@ export default async function DashboardPage() {
       <Widgets
         income={income.totalAmount}
         expenses={expenses.totalAmount}
-        invoiceCount={invoiceCount}
+        openCount={openAndPaidInvoices.open}
+        paidCount={openAndPaidInvoices.paid}
       />
       <Separator className="mt-5" />
       <div className="mt-5 flex items-center justify-between">
@@ -50,8 +52,12 @@ export default async function DashboardPage() {
               <CirclePlus /> Create Invoice
             </Link>
           </Button>
-          <Button variant="outline" size="icon" asChild>
-            <Link href="/analysis">
+          <GlowingButton
+            size="icon"
+            className="relative z-10 transition-colors duration-200"
+            variant="outline"
+          >
+            <Link href="/assistant">
               <Image
                 src={aiImage}
                 alt="AI-Image"
@@ -61,7 +67,7 @@ export default async function DashboardPage() {
                 style={{ width: 'auto', height: 'auto' }}
               />
             </Link>
-          </Button>
+          </GlowingButton>
         </div>
       </div>
       <Invoices invoices={invoices} userId={session?.user.id || ''} />
