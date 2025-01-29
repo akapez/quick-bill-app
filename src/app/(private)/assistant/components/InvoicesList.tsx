@@ -72,7 +72,7 @@ export default function InvoiceList({ invoices }: InvoiceListProps) {
               {invoice.receiver?.name}
             </div>
             <p className="mt-2 text-sm text-muted-foreground">
-              Reason: {invoice.description}
+              Purpose: {invoice.description}
             </p>
           </CardContent>
           <CardFooter className="flex justify-between">

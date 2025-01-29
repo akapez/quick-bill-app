@@ -57,11 +57,17 @@ export const createInvoice = async (values: InvoiceSchema, userId: string) => {
 };
 
 // get invoices by user id
-export const getInvoicesByUserId = async (userId: string) => {
+export const getInvoicesByUserId = async (
+  userId: string,
+  page: number = 1,
+  pageSize: number = 5
+) => {
   if (!userId) {
-    return [];
+    return { invoices: [], total: 0, totalPages: 0 };
   }
+
   try {
+    const skip = (page - 1) * pageSize;
     const invoices = await prisma.invoice.findMany({
       where: { OR: [{ senderId: userId }, { receiverId: userId }] },
       include: {
@@ -83,10 +89,21 @@ export const getInvoicesByUserId = async (userId: string) => {
         },
       },
       orderBy: { createdAt: 'desc' },
+      skip,
+      take: pageSize,
     });
-    return invoices;
+    const totalInvoices = await prisma.invoice.count({
+      where: { OR: [{ senderId: userId }, { receiverId: userId }] },
+    });
+    return {
+      invoices,
+      total: totalInvoices,
+      page,
+      pageSize,
+      totalPages: Math.ceil(totalInvoices / pageSize),
+    };
   } catch {
-    return [];
+    return { invoices: [], total: 0, page, pageSize, totalPages: 0 };
   }
 };
 
