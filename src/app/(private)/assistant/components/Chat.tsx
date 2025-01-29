@@ -18,19 +18,21 @@ import { Input } from '@components/ui/Input';
 import { ScrollArea } from '@components/ui/ScrollArea';
 import { Separator } from '@components/ui/Separator';
 
+import DetailsList from './DetailsList';
+import DetailsListSkeleton from './DetailsListSkeleton';
 import { BotIcon, UserIcon } from './icons';
 import { InvoiceListSkeleton } from './InvoiceListSkeleton';
 import InvoiceList from './InvoicesList';
-import MetricsCard from './MetricsCard';
-import MetricsSkeleton from './MetricsSkeleton';
+import OverviewCard from './OverviewCard';
+import OverviewSkeleton from './OverviewSkeleton';
 
 const month = format(new Date(), 'MMMM');
 
 const suggestedActions = [
   {
-    title: 'Summary',
-    label: `monthly finance summery - ${month}`,
-    action: 'Display the finance summary of the month',
+    title: 'Overview',
+    label: `monthly finance overview - ${month}`,
+    action: 'Display the finance overview of the month',
   },
   {
     title: 'Unpaid invoices',
@@ -99,11 +101,11 @@ export default function Chat() {
                   const { toolName, toolCallId, state } = toolInvocation;
 
                   if (state === 'result') {
-                    if (toolName === 'displayMetrics') {
+                    if (toolName === 'displayOverview') {
                       const { result } = toolInvocation;
                       return (
                         <div key={toolCallId}>
-                          <MetricsCard {...result} />
+                          <OverviewCard {...result} />
                         </div>
                       );
                     } else if (toolName === 'displayOpenInvoices') {
@@ -113,18 +115,31 @@ export default function Chat() {
                           <InvoiceList {...result} />
                         </div>
                       );
-                    }
-                  } else {
-                    if (toolName === 'displayMetrics') {
+                    } else if (toolName === 'displayAnalyze') {
+                      const { result } = toolInvocation;
                       return (
                         <div key={toolCallId}>
-                          <MetricsSkeleton />
+                          <DetailsList {...result} />
+                        </div>
+                      );
+                    }
+                  } else {
+                    if (toolName === 'displayOverview') {
+                      return (
+                        <div key={toolCallId}>
+                          <OverviewSkeleton />
                         </div>
                       );
                     } else if (toolName === 'displayOpenInvoices') {
                       return (
                         <div key={toolCallId}>
                           <InvoiceListSkeleton />
+                        </div>
+                      );
+                    } else if (toolName === 'displayAnalyze') {
+                      return (
+                        <div key={toolCallId}>
+                          <DetailsListSkeleton />
                         </div>
                       );
                     }

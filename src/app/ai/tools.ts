@@ -18,8 +18,8 @@ export const weatherTool = createTool({
   },
 });
 
-export const metricsTool = createTool({
-  description: 'Display the finance summary of the month',
+export const overviewTool = createTool({
+  description: 'Display the finance overview of the month',
   parameters: z.object({}),
   execute: async function () {
     const session = await auth();
@@ -39,6 +39,24 @@ export const metricsTool = createTool({
   },
 });
 
+export const analyzeTool = createTool({
+  description: 'Analyze income and expenses',
+  parameters: z.object({}),
+  execute: async function () {
+    const session = await auth();
+    const userId = session?.user.id || '';
+    const [income, expenses] = await Promise.all([
+      getTotalIncome(userId),
+      getTotalExpenses(userId),
+    ]);
+
+    return {
+      incomeInvoices: income.invoices,
+      expensesInvoices: expenses.invoices,
+    };
+  },
+});
+
 export const openInvoiceTool = createTool({
   description: 'Show the open invoices that are currently available',
   parameters: z.object({}),
@@ -54,6 +72,7 @@ export const openInvoiceTool = createTool({
 
 export const tools = {
   displayWeather: weatherTool,
-  displayMetrics: metricsTool,
+  displayOverview: overviewTool,
   displayOpenInvoices: openInvoiceTool,
+  displayAnalyze: analyzeTool,
 };

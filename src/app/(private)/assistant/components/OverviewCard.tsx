@@ -10,19 +10,19 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/Card';
 
-interface MetricsCardProps {
+interface OverviewCardProps {
   income: number;
   expenses: number;
   openCount: number;
   paidCount: number;
 }
 
-export default function MetricsCard({
+export default function OverviewCard({
   income,
   expenses,
   openCount,
   paidCount,
-}: MetricsCardProps) {
+}: OverviewCardProps) {
   const now = new Date();
   // date range of month
   const start = startOfMonth(now);
@@ -32,7 +32,7 @@ export default function MetricsCard({
   return (
     <Card className="mb-5 w-full">
       <CardHeader className="flex-cols flex md:flex-row md:items-center md:justify-between">
-        <CardTitle className="text-lg font-semibold">Metrics</CardTitle>
+        <CardTitle className="text-lg font-semibold">Overview</CardTitle>
         <div className="flex items-center space-x-1 text-sm text-muted-foreground">
           <Calendar className="h-4 w-4" />
           <span>

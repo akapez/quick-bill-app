@@ -17,17 +17,26 @@ import { Button } from '@components/ui/Button';
 import { Separator } from '@components/ui/Separator';
 
 import Invoices from './components/Invoices';
+import TablePagination from './components/TablePagination';
 import Widgets from './components/Widgets';
+
+const pageSize = 5;
 
 export const metadata: Metadata = {
   title: 'Dashboard',
 };
+interface DashboardPageProps {
+  searchParams: Promise<{ page: string }>;
+}
 
-export default async function DashboardPage() {
+export default async function DashboardPage({
+  searchParams,
+}: DashboardPageProps) {
+  const page = (await searchParams).page || 1;
   const session = await auth();
   const userId = session?.user.id || '';
   const [invoices, income, expenses, openAndPaidInvoices] = await Promise.all([
-    getInvoicesByUserId(userId),
+    getInvoicesByUserId(userId, Number(page), pageSize),
     getTotalIncome(userId),
     getTotalExpenses(userId),
     getPaidAndOpenInvoices(userId),
@@ -70,7 +79,13 @@ export default async function DashboardPage() {
           </GlowingButton>
         </div>
       </div>
-      <Invoices invoices={invoices} userId={session?.user.id || ''} />
+      <Invoices invoices={invoices.invoices} userId={session?.user.id || ''} />
+
+      <TablePagination
+        page={Number(page)}
+        totalPages={invoices.totalPages}
+        total={invoices.invoices.length}
+      />
     </div>
   );
 }
