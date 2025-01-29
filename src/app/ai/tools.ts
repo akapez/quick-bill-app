@@ -51,8 +51,8 @@ export const analyzeTool = createTool({
     ]);
 
     return {
-      incomeInvoices: income.invoices,
-      expensesInvoices: expenses.invoices,
+      income: income.invoices,
+      expenses: expenses.invoices,
     };
   },
 });
