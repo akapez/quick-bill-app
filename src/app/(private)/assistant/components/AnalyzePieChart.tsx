@@ -57,7 +57,7 @@ export function AnalyzePieChart({
   const month = format(new Date(), 'MMMM');
 
   return (
-    <Card className="flex max-w-sm flex-col">
+    <Card className="mb-5 flex max-w-sm flex-col">
       <CardHeader className="items-center pb-0">
         <CardTitle>Income vs Expense</CardTitle>
         <CardDescription>{month}</CardDescription>

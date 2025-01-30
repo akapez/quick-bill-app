@@ -55,7 +55,7 @@ export default function InvoiceList({ invoices }: InvoiceListProps) {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="mb-5 space-y-4">
       {invoices.map((invoice) => (
         <Card key={invoice.invoiceNumber} className="w-full max-w-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

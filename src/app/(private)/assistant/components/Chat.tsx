@@ -3,7 +3,7 @@
 import { useChat } from 'ai/react';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
-import { Send } from 'lucide-react';
+import { Bot, Send, User } from 'lucide-react';
 import Markdown from 'react-markdown';
 
 import { Button } from '@components/ui/Button';
@@ -22,7 +22,6 @@ import { AnalyzePieChart } from './AnalyzePieChart';
 import { AnalyzePieChartSkeleton } from './AnalyzePieChartSkeleton';
 import DetailsList from './DetailsList';
 import DetailsListSkeleton from './DetailsListSkeleton';
-import { BotIcon, UserIcon } from './icons';
 import { InvoiceListSkeleton } from './InvoiceListSkeleton';
 import InvoiceList from './InvoicesList';
 import OverviewCard from './OverviewCard';
@@ -100,7 +99,7 @@ export default function Chat() {
                 animate={{ y: 0, opacity: 1 }}
               >
                 <div className="flex size-[24px] flex-shrink-0 flex-col items-center justify-center text-zinc-400">
-                  {message.role === 'assistant' ? <BotIcon /> : <UserIcon />}
+                  {message.role === 'assistant' ? <Bot /> : <User />}
                 </div>
                 <div className="flex w-full flex-col gap-1">
                   <div className="flex flex-col gap-4 text-zinc-800 dark:text-zinc-300">
