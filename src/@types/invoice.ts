@@ -33,3 +33,9 @@ export type Info = {
     name: string | null;
   };
 };
+
+export type ChartInfo = {
+  value: number;
+  name: string;
+  fill: string;
+};

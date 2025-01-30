@@ -16,7 +16,7 @@ export default function BrandText() {
       >
         Introducing QuickBill
       </span>
-      <ChevronRight className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+      <ChevronRight className="ml-1 size-3 text-gray-400 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
     </AnimatedGradientText>
   );
 }
