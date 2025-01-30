@@ -1,7 +1,6 @@
 'use client';
 
 import { Fragment, useState, useTransition } from 'react';
-import Link from 'next/link';
 
 import { generatedData } from '@actions/gemini';
 import { Info } from '@definitions/invoice';
@@ -14,7 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@components/ui/Card';
 import { ScrollArea } from '@components/ui/ScrollArea';
 import { Separator } from '@components/ui/Separator';
 
-import Message from './AlertInfo';
+import AlertInfo from './AlertInfo';
 
 interface AnalysisProps {
   income: { totalAmount: number; invoices: Info[] };
@@ -42,8 +41,6 @@ export default function Analysis({
   const start_month = format(start, 'MMM dd');
   const end_month = format(end, 'MMM dd, yyyy');
 
-  const isEnoughData = income.totalAmount > 100 && expenses.totalAmount > 100;
-
   const onAnalyze = async () => {
     startTransition(async () => {
       const report = await generatedData(
@@ -61,13 +58,8 @@ export default function Analysis({
     });
   };
 
-  const infoTitleFirst =
+  const info =
     'Visualize and analyze detailed financial data, including income, expenses, and performance metrics.';
-
-  const infoTitleTwo = `Due to insufficient data for comprehensive financial insights,
-  let's proceed with invoicing. To ensure a valid invoice, please
-  confirm that your total income exceeds $100 and your total expenses
-  exceeds $100.`;
 
   return (
     <Card className="mt-4 w-full">
@@ -84,7 +76,7 @@ export default function Analysis({
               </div>
             </Fragment>
           ) : (
-            <Message title={infoTitleFirst}>
+            <AlertInfo title={info}>
               <Button
                 onClick={onAnalyze}
                 disabled={isPending}
@@ -93,14 +85,7 @@ export default function Analysis({
               >
                 {isPending ? 'Analyzing...' : 'Analyze'}
               </Button>
-            </Message>
-          )}
-          {!isEnoughData && (
-            <Message title={infoTitleTwo}>
-              <Button variant="outline" asChild className="ml-5">
-                <Link href="/invoice">Create Invoice</Link>
-              </Button>
-            </Message>
+            </AlertInfo>
           )}
           {isPending && (
             <div className="mt-5 text-left">

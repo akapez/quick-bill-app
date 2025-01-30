@@ -18,6 +18,8 @@ import { Input } from '@components/ui/Input';
 import { ScrollArea } from '@components/ui/ScrollArea';
 import { Separator } from '@components/ui/Separator';
 
+import { AnalyzePieChart } from './AnalyzePieChart';
+import { AnalyzePieChartSkeleton } from './AnalyzePieChartSkeleton';
 import DetailsList from './DetailsList';
 import DetailsListSkeleton from './DetailsListSkeleton';
 import { BotIcon, UserIcon } from './icons';
@@ -30,6 +32,11 @@ const month = format(new Date(), 'MMMM');
 
 const suggestedActions = [
   {
+    title: 'Analyze',
+    label: `income vs expenses - ${month}`,
+    action: 'Show me the analyze of income vs expenses',
+  },
+  {
     title: 'Overview',
     label: `monthly finance overview - ${month}`,
     action: 'Display the finance overview of the month',
@@ -38,6 +45,11 @@ const suggestedActions = [
     title: 'Unpaid invoices',
     label: 'list of open invoices',
     action: 'Show me the open invoices that are currently available',
+  },
+  {
+    title: 'All invoices',
+    label: 'list of income and expresses',
+    action: 'Show me the all invoices that available on income and expenses',
   },
 ];
 
@@ -119,6 +131,13 @@ export default function Chat() {
                       const { result } = toolInvocation;
                       return (
                         <div key={toolCallId}>
+                          <AnalyzePieChart {...result} />
+                        </div>
+                      );
+                    } else if (toolName === 'displayList') {
+                      const { result } = toolInvocation;
+                      return (
+                        <div key={toolCallId}>
                           <DetailsList {...result} />
                         </div>
                       );
@@ -137,6 +156,12 @@ export default function Chat() {
                         </div>
                       );
                     } else if (toolName === 'displayAnalyze') {
+                      return (
+                        <div key={toolCallId}>
+                          <AnalyzePieChartSkeleton />
+                        </div>
+                      );
+                    } else if (toolName === 'displayList') {
                       return (
                         <div key={toolCallId}>
                           <DetailsListSkeleton />

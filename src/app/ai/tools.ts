@@ -3,6 +3,7 @@ import {
   getTotalExpenses,
   getTotalIncome,
 } from '@actions/invoice';
+import { ChartInfo } from '@definitions/invoice';
 import { auth } from '@lib/auth';
 import { tool as createTool } from 'ai';
 import { z } from 'zod';
@@ -49,7 +50,36 @@ export const analyzeTool = createTool({
       getTotalIncome(userId),
       getTotalExpenses(userId),
     ]);
+    const chartData: ChartInfo[] = [
+      {
+        name: 'Income Invoices: ',
+        value: income.invoices.length,
+        fill: 'var(--color-income)',
+      },
+      {
+        name: 'Expense Invoices: ',
+        value: expenses.invoices.length,
+        fill: 'var(--color-expense)',
+      },
+    ];
+    return {
+      chartData,
+      income: income.totalAmount,
+      expenses: expenses.totalAmount,
+    };
+  },
+});
 
+export const listTool = createTool({
+  description: 'All invoices that available on income and expenses',
+  parameters: z.object({}),
+  execute: async function () {
+    const session = await auth();
+    const userId = session?.user.id || '';
+    const [income, expenses] = await Promise.all([
+      getTotalIncome(userId),
+      getTotalExpenses(userId),
+    ]);
     return {
       income: income.invoices,
       expenses: expenses.invoices,
@@ -75,4 +105,5 @@ export const tools = {
   displayOverview: overviewTool,
   displayOpenInvoices: openInvoiceTool,
   displayAnalyze: analyzeTool,
+  displayList: listTool,
 };
