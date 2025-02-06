@@ -2,6 +2,8 @@
 
 A **Next.js** application for invoice management, powered by **Gemini API** and **OpenAI (Vercel AI SDK)**. This AI-driven system analyzes financial data and provides insights for better financial management, as well as chats with AI assistants with interactive generative UI.
 
+![Screenshot of a home page](https://raw.githubusercontent.com/akapez/quick-bill-app/refs/heads/main/screenshot.png)
+
 ## Table of Contents
 
 - [Features](#features)
