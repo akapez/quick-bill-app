@@ -4,6 +4,8 @@ A **Next.js** application for invoice management, powered by **Gemini API** and 
 
 ![Screenshot of a home page](https://raw.githubusercontent.com/akapez/quick-bill-app/refs/heads/main/screenshot.png)
 
+https://github.com/user-attachments/assets/eb793c1d-db60-4396-9745-e0dc4306599c
+
 ## Table of Contents
 
 - [Features](#features)
